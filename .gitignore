@@ -1,0 +1,13 @@
+# Secrets
+.env
+
+# Generated output and the ledger database
+assets/*
+!assets/.gitkeep
+*.sqlite3
+
+# Python
+__pycache__/
+*.egg-info/
+.venv/
+.pytest_cache/

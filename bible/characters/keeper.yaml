@@ -1,0 +1,14 @@
+# A sample character. Replace with your own in M1.
+id: keeper
+name: Ines Calder
+appearance: >-
+  a lighthouse keeper in her late 50s, weathered tan skin, deep-set grey eyes,
+  silver hair in a short braid, a thin scar through her left eyebrow
+costumes:
+  storm_coat: >-
+    a long oilskin coat in faded mustard yellow with brass toggles,
+    a navy knit scarf, black rubber boots
+  indoor: >-
+    a cream cable-knit fisherman's sweater with rolled sleeves, dark canvas trousers
+# Filled in at M3 with the paths of the reference images you lock.
+reference_images: []

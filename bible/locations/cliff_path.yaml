@@ -1,0 +1,8 @@
+id: cliff_path
+name: Cliff path
+description: >-
+  a narrow gravel path along a grassy sea cliff, the lighthouse in the
+  distance, waves breaking on black rocks below
+lighting: overcast dawn, flat silver light, low fog over the water
+palette: ["#8a9a9b", "#4f6b4a", "#2b2f33"]
+reference_images: []

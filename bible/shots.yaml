@@ -1,0 +1,25 @@
+# The shot list. Every shot references the bible by id; prompts are built from it.
+style: cinematic 35mm film still, anamorphic, shallow depth of field, natural film grain
+
+shots:
+  - id: s01
+    character: keeper
+    costume: storm_coat
+    location: cliff_path
+    framing: wide shot
+    action: she walks toward the lighthouse, leaning into the wind
+    duration_s: 5
+  - id: s02
+    character: keeper
+    costume: storm_coat
+    location: cliff_path
+    framing: medium close-up
+    action: she stops and looks out to sea, squinting
+    duration_s: 5
+  - id: s03
+    character: keeper
+    costume: indoor
+    location: lantern_room
+    framing: close-up
+    action: she polishes the brass lens, her reflection distorted in the glass
+    duration_s: 5
