@@ -17,7 +17,7 @@ bible (YAML) -> canonical refs -> keyframes -> still QA -> animate -> video QA -
 ## Quick start
 
 ```bash
-python -m venv .venv && source .venv/bin/activate
+python3 -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
 cp .env.example .env          # add your BFL key later (M2); DRY_RUN stays true until then
 
@@ -29,20 +29,20 @@ pytest
 
 ## Layout
 
-| Path | What it is |
-| --- | --- |
-| `bible/` | Stage 1: characters, locations and the shot list, as YAML |
-| `src/fluxpipe/bible.py` | Loads and validates the bible |
-| `src/fluxpipe/prompts.py` | Builds every prompt from one template |
-| `src/fluxpipe/ledger.py` | SQLite log of every paid call; enforces `SPEND_CAP_USD` |
-| `src/fluxpipe/config.py` | Settings and the estimated price table |
-| `src/fluxpipe/bfl_client.py` | The only code that talks to the BFL API |
-| `src/fluxpipe/qa/` | Face, palette, costume and video checks (M5-M6) |
-| `assets/` | Generated output and the ledger database (git-ignored) |
+| Path                         | What it is                                                |
+| ---------------------------- | --------------------------------------------------------- |
+| `bible/`                     | Stage 1: characters, locations and the shot list, as YAML |
+| `src/fluxpipe/bible.py`      | Loads and validates the bible                             |
+| `src/fluxpipe/prompts.py`    | Builds every prompt from one template                     |
+| `src/fluxpipe/ledger.py`     | SQLite log of every paid call; enforces `SPEND_CAP_USD`   |
+| `src/fluxpipe/config.py`     | Settings and the estimated price table                    |
+| `src/fluxpipe/bfl_client.py` | The only code that talks to the BFL API                   |
+| `src/fluxpipe/qa/`           | Face, palette, costume and video checks (M5-M6)           |
+| `assets/`                    | Generated output and the ledger database (git-ignored)    |
 
 ## Guardrails
 
-- **Spend cap.** The ledger writes a row *before* each paid call and refuses the call if
+- **Spend cap.** The ledger writes a row _before_ each paid call and refuses the call if
   estimated spend would pass `SPEND_CAP_USD`. Failed calls still count, since they may be billed.
 - **Dry run.** With `DRY_RUN=true`, calls are logged but never sent.
 - **Secrets.** The API key lives in `.env`, which git ignores.
