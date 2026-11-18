@@ -1,14 +1,27 @@
 # A sample character. Replace with your own in M1.
+#
+# identity = what must NEVER change between shots. Be specific and physical:
+# "deep-set grey eyes" survives 10 generations; "kind eyes" drifts on the 2nd.
+# One unusual mark (a scar, a streak of colour) gives you and the QA step an anchor.
 id: keeper
 name: Ines Calder
-appearance: >-
-  a lighthouse keeper in her late 50s, weathered tan skin, deep-set grey eyes,
-  silver hair in a short braid, a thin scar through her left eyebrow
+identity:
+  who: a woman lighthouse keeper
+  age: in her late 50s
+  build: tall and wiry, slightly stooped shoulders
+  face: weathered tan skin, deep-set grey eyes, high cheekbones, deep laugh lines
+  hair: silver hair in a single short braid
+  marks: a thin pale scar through her left eyebrow
+
+# costumes = what CAN change, but only between scenes, never within one.
+# Hex codes pin colours exactly (FLUX.2 reads "in color #RRGGBB").
 costumes:
   storm_coat: >-
-    a long oilskin coat in faded mustard yellow with brass toggles,
-    a navy knit scarf, black rubber boots
+    a long oilskin coat in color #C9A227 with brass toggles,
+    a navy knit scarf in color #1F2A44, black rubber boots
   indoor: >-
-    a cream cable-knit fisherman's sweater with rolled sleeves, dark canvas trousers
+    a cream cable-knit fisherman's sweater in color #EFE6D2 with rolled sleeves,
+    dark canvas trousers
+
 # Filled in at M3 with the paths of the reference images you lock.
 reference_images: []

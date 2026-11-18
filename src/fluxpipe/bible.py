@@ -5,18 +5,38 @@ from __future__ import annotations
 from pathlib import Path
 
 import yaml
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
-class Character(BaseModel):
+class Strict(BaseModel):
+    """Unknown keys are errors, so a typo in the YAML can't silently vanish."""
+
+    model_config = ConfigDict(extra="forbid")
+
+
+class Identity(Strict):
+    """What must never change between shots. Every field is required on purpose."""
+
+    who: str  # the noun: "a woman lighthouse keeper"
+    age: str
+    build: str
+    face: str
+    hair: str
+    marks: str
+
+    def describe(self) -> str:
+        return f"{self.who} {self.age}, {self.build}, {self.face}, {self.hair}, {self.marks}"
+
+
+class Character(Strict):
     id: str
     name: str
-    appearance: str
+    identity: Identity
     costumes: dict[str, str]
     reference_images: list[str] = Field(default_factory=list)
 
 
-class Location(BaseModel):
+class Location(Strict):
     id: str
     name: str
     description: str
@@ -25,21 +45,42 @@ class Location(BaseModel):
     reference_images: list[str] = Field(default_factory=list)
 
 
-class Shot(BaseModel):
+class Camera(Strict):
+    angle: str | None = None
+    lens: str | None = None
+    depth_of_field: str | None = None
+
+
+class Shot(Strict):
     id: str
     character: str
     costume: str
     location: str
     framing: str
     action: str
+    position: str = "centre frame"
+    mood: str = ""
+    camera: Camera = Field(default_factory=Camera)
     duration_s: float = 5
 
 
-class Bible(BaseModel):
+class Bible(Strict):
     style: str
+    camera_defaults: Camera
     characters: dict[str, Character]
     locations: dict[str, Location]
     shots: list[Shot]
+
+    def camera_for(self, shot: Shot) -> dict[str, str]:
+        """Defaults first, then the shot's overrides. Fewer hand-typed values = less drift."""
+        merged = self.camera_defaults.model_dump() | shot.camera.model_dump(exclude_none=True)
+        return {k: v for k, v in merged.items() if v}
+
+    def shot(self, shot_id: str) -> Shot:
+        for s in self.shots:
+            if s.id == shot_id:
+                return s
+        raise KeyError(f"No shot '{shot_id}'. Shots: {', '.join(s.id for s in self.shots)}")
 
     def problems(self) -> list[str]:
         """Every broken reference in the bible. An empty list means it's valid."""
@@ -74,6 +115,7 @@ def load_bible(bible_dir: Path) -> Bible:
     shots_file = yaml.safe_load((bible_dir / "shots.yaml").read_text())
     return Bible(
         style=shots_file["style"],
+        camera_defaults=Camera.model_validate(shots_file.get("camera_defaults") or {}),
         characters=_load_dir(bible_dir / "characters", Character),
         locations=_load_dir(bible_dir / "locations", Location),
         shots=[Shot.model_validate(s) for s in shots_file["shots"]],

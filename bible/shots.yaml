@@ -1,25 +1,44 @@
 # The shot list. Every shot references the bible by id; prompts are built from it.
-style: cinematic 35mm film still, anamorphic, shallow depth of field, natural film grain
+
+# Applies to every shot. One look for the whole film = one place to change it.
+style: cinematic 35mm film still, anamorphic, natural film grain, muted colour grade
+
+# Every shot starts from these; a shot overrides only what it needs.
+camera_defaults:
+  angle: eye level
+  lens: 35mm
+  depth_of_field: shallow, subject sharp, background soft
 
 shots:
   - id: s01
     character: keeper
     costume: storm_coat
     location: cliff_path
-    framing: wide shot
+    framing: wide shot, subject small in the lower third
+    camera: { lens: 24mm, depth_of_field: "deep, everything in focus" }
+    position: walking along the path, left of centre
     action: she walks toward the lighthouse, leaning into the wind
+    mood: determined, lonely
     duration_s: 5
+
   - id: s02
     character: keeper
     costume: storm_coat
     location: cliff_path
-    framing: medium close-up
+    framing: medium close-up, head and shoulders
+    camera: { lens: 85mm }
+    position: centre frame, facing the sea
     action: she stops and looks out to sea, squinting
+    mood: uneasy
     duration_s: 5
+
   - id: s03
     character: keeper
     costume: indoor
     location: lantern_room
-    framing: close-up
+    framing: close-up of her face beside the lens
+    camera: { angle: slightly low, lens: 50mm }
+    position: right of frame, the lens filling the left
     action: she polishes the brass lens, her reflection distorted in the glass
+    mood: calm, private
     duration_s: 5

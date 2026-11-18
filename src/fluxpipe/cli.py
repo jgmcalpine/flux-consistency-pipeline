@@ -1,13 +1,20 @@
-"""Command line: fluxpipe validate | prompts | budget"""
+"""Command line: fluxpipe validate | prompts | diff | budget"""
 
 from __future__ import annotations
+
+import json
 
 import typer
 
 from .bible import load_bible
 from .config import load_settings
 from .ledger import Ledger
-from .prompts import build_prompt, reference_images
+from .prompts import _flatten, as_text, build_structured, reference_images
+from .prompts import diff as prompt_diff
+
+
+def _all_fields(a: dict, b: dict) -> set[str]:
+    return _flatten(a).keys() | _flatten(b).keys()
 
 app = typer.Typer(help="A consistency pipeline for FLUX.", no_args_is_help=True)
 
@@ -30,17 +37,40 @@ def validate() -> None:
 
 
 @app.command()
-def prompts(shot: str = typer.Option(None, help="Only this shot id.")) -> None:
+def prompts(
+    shot: str = typer.Option(None, help="Only this shot id."),
+    as_: str = typer.Option("text", "--as", help="text (readable) or json (what the API gets)."),
+) -> None:
     """Print the prompt (and attached references) each shot will be generated from."""
     settings = load_settings()
     bible = load_bible(settings.bible_dir)
     for s in bible.shots:
         if shot and s.id != shot:
             continue
+        structured = build_structured(bible, s)
         typer.secho(f"[{s.id}] {s.duration_s:g}s", bold=True)
-        typer.echo(build_prompt(bible, s))
+        typer.echo(json.dumps(structured, indent=2) if as_ == "json" else as_text(structured))
         refs = reference_images(bible, s)
         typer.secho(f"  refs: {', '.join(refs) if refs else '(none yet, locked at M3)'}\n", dim=True)
+
+
+@app.command()
+def diff(shot_a: str, shot_b: str) -> None:
+    """Show exactly which prompt fields differ between two shots. Everything else is identical."""
+    settings = load_settings()
+    bible = load_bible(settings.bible_dir)
+    a = build_structured(bible, bible.shot(shot_a))
+    b = build_structured(bible, bible.shot(shot_b))
+    changes = prompt_diff(a, b)
+    if not changes:
+        typer.echo("Identical prompts.")
+        return
+    for field, va, vb in changes:
+        typer.secho(field, bold=True)
+        typer.secho(f"  {shot_a}: {va}", fg="red")
+        typer.secho(f"  {shot_b}: {vb}", fg="green")
+    same = len(_all_fields(a, b)) - len(changes)
+    typer.echo(f"\n{len(changes)} field(s) differ; {same} identical.")
 
 
 @app.command()
