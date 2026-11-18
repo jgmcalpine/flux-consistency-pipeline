@@ -96,7 +96,8 @@ class BFLClient:
             prompt=payload.get("prompt", ""),
             seed=payload.get("seed"),
             refs=refs,
-            params={k: v for k, v in payload.items() if k != "prompt"},
+            # Reference image data is left out: `refs` records their paths instead.
+            params={k: v for k, v in payload.items() if k != "prompt" and not k.startswith("input_image")},
             est_cost_usd=est_cost_usd,
             shot_id=shot_id,
             dry_run=self.dry_run,

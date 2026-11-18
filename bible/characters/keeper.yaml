@@ -6,7 +6,7 @@
 id: keeper
 name: Ismael Calder
 identity:
-  who: a man who is an artist living in the jungle
+  who: a man, a jewelry-maker
   age: in his early 40s
   build: tall and wiry, slightly stooped shoulders
   face: weathered tan skin, deep-set brown-green eyes, high cheekbones, deep laugh lines, short dark beard flecked with grey, neatly trimmed
@@ -18,10 +18,10 @@ identity:
 costumes:
   beachwear: >-
     a tank top in color #1A6DBD with a circle of color #D2E312 on the front,
-    a pair of shorts in color #9C8084, black sandals
+    a pair of shorts in color #9C8084, simple brown rope sandals
   indoor: >-
     a light blue short-sleeved shirt in color #A1D3F0 with a circle of color #D2E312 on the front,
-    a pair of dark blue pants in color #9C8084, black sandals
+    a pair of mauve-grey pants in color #9C8084, black sandals
 
 # Filled in at M3 with the paths of the reference images you lock.
 reference_images: []

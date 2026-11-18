@@ -9,23 +9,56 @@ composition, camera). From that one dict we can:
   - diff two shots field by field, to prove they differ only where the story does.
 
 The character's identity is copied word for word into every shot. That is the whole trick.
+From M3 the locked reference images are attached too, and the prompt says which is which
+("image 1", "image 2"... in attachment order, as BFL's multi-reference guide recommends).
 """
 
 from __future__ import annotations
 
 import json
 
+from dataclasses import dataclass
+
 from .bible import Bible, Shot
+
+
+@dataclass(frozen=True)
+class Ref:
+    role: str  # face | costume | location
+    path: str  # relative to the bible folder
+
+
+def shot_refs(bible: Bible, shot: Shot) -> list[Ref]:
+    """The locked references for a shot, in the order they are attached (image 1, 2, ...)."""
+    char = bible.characters[shot.character]
+    loc = bible.locations[shot.location]
+    return [
+        *(Ref("face", r) for r in char.reference_images),
+        *(Ref("costume", r) for r in char.costume_references.get(shot.costume, [])),
+        *(Ref("location", r) for r in loc.reference_images),
+    ]
+
+
+def _images(refs: list[Ref], role: str) -> str:
+    nums = [f"image {i}" for i, r in enumerate(refs, 1) if r.role == role]
+    return " and ".join(nums)
 
 
 def build_structured(bible: Bible, shot: Shot) -> dict:
     char = bible.characters[shot.character]
     loc = bible.locations[shot.location]
+    refs = shot_refs(bible, shot)
+    who, outfit, place = (_images(refs, r) for r in ("face", "costume", "location"))
+    description = f"{char.identity.describe()}, wearing {char.costumes[shot.costume]}"
+    if who:
+        description = f"the same person as in {who}: {description}"
+    if outfit:
+        description += f", exactly the outfit shown in {outfit}"
     prompt = {
-        "scene": loc.description,
+        "scene": f"the location from {place}: {loc.description}" if place else loc.description,
         "subjects": [
             {
-                "description": f"{char.identity.describe()}, wearing {char.costumes[shot.costume]}",
+                "description": description,
                 "position": shot.position,
                 "action": shot.action,
             }
@@ -90,8 +123,5 @@ def diff(a: dict, b: dict) -> list[tuple[str, str | None, str | None]]:
 
 
 def reference_images(bible: Bible, shot: Shot) -> list[str]:
-    """The locked references to attach to this shot (filled in at M3)."""
-    return [
-        *bible.characters[shot.character].reference_images,
-        *bible.locations[shot.location].reference_images,
-    ]
+    """The locked reference paths for this shot, in attachment order."""
+    return [r.path for r in shot_refs(bible, shot)]

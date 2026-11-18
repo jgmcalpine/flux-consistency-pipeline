@@ -12,7 +12,7 @@ bible (YAML) -> canonical refs -> keyframes -> still QA -> animate -> video QA -
                       \______________ every paid call goes through the ledger ____/
 ```
 
-> Status: **M2, first API call.** Structured bible and prompts (M1) done; the BFL client is wired up and tested, pending the first real call.
+> Status: **M3, canonical references.** M0-M2 done (real calls verified). Reference generation and locking are built; picking the references is next.
 
 ## Quick start
 
@@ -25,6 +25,7 @@ fluxpipe validate             # check the story bible
 fluxpipe prompts              # see the prompt every shot will use
 fluxpipe generate s01         # one still (logged only while DRY_RUN=true)
 fluxpipe credits              # BFL balance (free call, needs the key)
+fluxpipe refs face keeper     # candidate reference images (M3); then: fluxpipe lock <path>
 fluxpipe budget               # estimated spend vs. the cap
 pytest
 ```

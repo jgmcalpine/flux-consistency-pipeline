@@ -14,9 +14,12 @@ from __future__ import annotations
 import zlib
 from dataclasses import dataclass
 
+from pathlib import Path
+
 from .bible import Bible, Shot
 from .config import IMAGE_PRICES_USD, estimate_cost
-from .prompts import as_json, build_structured
+from .images import as_base64, png_size
+from .prompts import as_json, build_structured, reference_images
 
 DEFAULT_MODEL = "flux-2-klein-4b"  # cheapest: ~$0.014 a still
 DEFAULT_SIZE = (1280, 720)
@@ -35,6 +38,36 @@ class Request:
     endpoint: str
     payload: dict
     est_cost_usd: float
+    refs: list[str]  # paths, for the ledger (the payload holds the image data)
+
+
+def check_size(width: int, height: int) -> None:
+    if width % SIZE_STEP or height % SIZE_STEP:
+        raise ValueError(f"width and height must be multiples of {SIZE_STEP}")
+
+
+def build_request(
+    model: str, prompt: dict, *, width: int, height: int, seed: int, ref_files: list[Path]
+) -> Request:
+    """One FLUX.2 request: the JSON prompt, size, seed, references as input_image, input_image_2..."""
+    if model not in IMAGE_PRICES_USD:
+        raise ValueError(f"Unknown model '{model}'. Known: {', '.join(IMAGE_PRICES_USD)}")
+    check_size(width, height)
+    max_refs = IMAGE_PRICES_USD[model].max_refs
+    if len(ref_files) > max_refs:
+        raise ValueError(f"{model} takes at most {max_refs} reference images, got {len(ref_files)}")
+    payload = {
+        "prompt": as_json(prompt),
+        "width": width,
+        "height": height,
+        "seed": seed,
+        "output_format": "png",  # lossless, so QA measures the model and not JPEG artefacts
+        **UPSAMPLING_OFF.get(model, {}),
+    }
+    for i, path in enumerate(ref_files, 1):
+        payload["input_image" if i == 1 else f"input_image_{i}"] = as_base64(path)
+    est = estimate_cost(model, width=width, height=height, refs=[png_size(p) for p in ref_files])
+    return Request(model, payload, est, [str(p) for p in ref_files])
 
 
 def shot_seed(shot_id: str) -> int:
@@ -51,17 +84,11 @@ def keyframe_request(
     height: int = DEFAULT_SIZE[1],
     seed: int | None = None,
 ) -> Request:
-    if model not in IMAGE_PRICES_USD:
-        raise ValueError(f"Unknown model '{model}'. Known: {', '.join(IMAGE_PRICES_USD)}")
-    if width % SIZE_STEP or height % SIZE_STEP:
-        raise ValueError(f"width and height must be multiples of {SIZE_STEP}")
-    payload = {
-        "prompt": as_json(build_structured(bible, shot)),
-        "width": width,
-        "height": height,
-        "seed": shot_seed(shot.id) if seed is None else seed,
-        "output_format": "png",  # lossless, so QA measures the model and not JPEG artefacts
-        **UPSAMPLING_OFF.get(model, {}),
-    }
-    # Reference images are attached from M3 onwards.
-    return Request(model, payload, estimate_cost(model, width=width, height=height))
+    return build_request(
+        model,
+        build_structured(bible, shot),
+        width=width,
+        height=height,
+        seed=shot_seed(shot.id) if seed is None else seed,
+        ref_files=[bible.ref_path(r) for r in reference_images(bible, shot)],
+    )

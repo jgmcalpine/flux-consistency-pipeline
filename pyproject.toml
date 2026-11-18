@@ -9,6 +9,7 @@ dependencies = [
     "pydantic>=2.6",
     "python-dotenv>=1.0",
     "pyyaml>=6.0",
+    "ruamel.yaml>=0.18",  # edits bible YAML without losing comments (fluxpipe lock)
     "typer>=0.12",
 ]
 

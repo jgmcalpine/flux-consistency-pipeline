@@ -1,8 +1,9 @@
-"""Command line: fluxpipe validate | prompts | diff | generate | credits | budget"""
+"""Command line: fluxpipe validate | prompts | diff | generate | refs | lock | credits | budget"""
 
 from __future__ import annotations
 
 import json
+from pathlib import Path
 
 import typer
 
@@ -11,6 +12,8 @@ from .bible import load_bible
 from .config import IMAGE_PRICES_USD, load_settings
 from .generate import DEFAULT_MODEL, DEFAULT_SIZE, keyframe_request
 from .ledger import Ledger, SpendCapExceeded
+from .refs import candidates as ref_candidates
+from .refs import lock as lock_ref
 from .prompts import _flatten, as_text, build_structured, reference_images
 from .prompts import diff as prompt_diff
 
@@ -117,6 +120,60 @@ def generate(
     reported = f"${result.actual_cost_usd:.3f}" if result.actual_cost_usd is not None else "not reported"
     typer.echo(f"  cost: estimated ${req.est_cost_usd:.3f}, BFL reported {reported}")
     typer.secho("  (the balance from `fluxpipe credits` takes a minute or two to catch up)", dim=True)
+
+
+@app.command()
+def refs(
+    kind: str = typer.Argument(..., help="face | sheet | plate"),
+    target: str = typer.Argument(..., help="A character id (face, sheet) or location id (plate)."),
+    costume: str = typer.Option(None, help="For sheet: which costume."),
+    n: int = typer.Option(4, help="How many candidates (different seeds) to make."),
+    model: str = typer.Option("flux-2-pro"),
+) -> None:
+    """Make candidate reference images to choose from. Then lock your favourite with `fluxpipe lock`."""
+    settings = load_settings()
+    bible = load_bible(settings.bible_dir)
+    try:
+        cands = ref_candidates(
+            bible, kind, target, out_dir=settings.assets_dir / "refs", n=n, model=model, costume=costume
+        )
+    except (ValueError, KeyError) as exc:
+        typer.secho(f"  x {exc}", fg="red")
+        raise typer.Exit(2)
+    total = sum(c.request.est_cost_usd for c in cands)
+    typer.echo(f"{n} x {kind} for {target}{f' ({costume})' if costume else ''} on {model}: ~${total:.3f}")
+
+    client = BFLClient(settings.api_key, Ledger(settings.ledger_path, settings.spend_cap_usd),
+                       dry_run=settings.dry_run)
+    for c in cands:
+        try:
+            result = client.run_job(
+                endpoint=c.request.endpoint, payload=c.request.payload,
+                est_cost_usd=c.request.est_cost_usd, stage="refs",
+                out_path=c.out, shot_id=f"{c.target}:{c.out.name.split('_s')[0]}", refs=c.request.refs,
+            )
+        except (SpendCapExceeded, BFLError) as exc:
+            typer.secho(f"  x {exc}", fg="red")
+            raise typer.Exit(1)
+        root = settings.assets_dir.parent
+        typer.echo(f"  {'(dry run) ' if result.dry_run else ''}{c.out.relative_to(root)}")
+    if not settings.dry_run:
+        typer.echo("Open them, pick one, then: fluxpipe lock <path>")
+
+
+@app.command()
+def lock(candidate: Path) -> None:
+    """Lock a chosen candidate as the canonical reference: copied into bible/refs/, recorded in the YAML."""
+    settings = load_settings()
+    bible = load_bible(settings.bible_dir)
+    try:
+        what, warnings = lock_ref(bible, settings.bible_dir, candidate.resolve())
+    except (ValueError, KeyError) as exc:
+        typer.secho(f"  x {exc}", fg="red")
+        raise typer.Exit(2)
+    typer.secho(f"Locked {what}", fg="green")
+    for w in warnings:
+        typer.secho(f"  ! {w}", fg="yellow")
 
 
 @app.command()

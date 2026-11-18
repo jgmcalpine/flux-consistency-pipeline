@@ -18,7 +18,7 @@ shots:
     camera: { lens: 24mm, depth_of_field: "deep, everything in focus" }
     position: walking along the path, left of centre
     action: he walks toward the thatched hut, leaning into the wind
-    mood: determined, peaceful
+    mood: peaceful
     duration_s: 5
 
   - id: s02

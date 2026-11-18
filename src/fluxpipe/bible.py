@@ -5,7 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import yaml
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, PrivateAttr
 
 
 class Strict(BaseModel):
@@ -33,7 +33,9 @@ class Character(Strict):
     name: str
     identity: Identity
     costumes: dict[str, str]
-    reference_images: list[str] = Field(default_factory=list)
+    # Locked at M3. Paths are relative to the bible folder.
+    reference_images: list[str] = Field(default_factory=list)  # the face, any costume
+    costume_references: dict[str, list[str]] = Field(default_factory=dict)  # costume id -> sheet
 
 
 class Location(Strict):
@@ -70,6 +72,11 @@ class Bible(Strict):
     characters: dict[str, Character]
     locations: dict[str, Location]
     shots: list[Shot]
+    _dir: Path | None = PrivateAttr(default=None)
+
+    def ref_path(self, ref: str) -> Path:
+        """A reference image path from the YAML, resolved against the bible folder."""
+        return (self._dir or Path(".")) / ref
 
     def camera_for(self, shot: Shot) -> dict[str, str]:
         """Defaults first, then the shot's overrides. Fewer hand-typed values = less drift."""
@@ -100,7 +107,23 @@ class Bible(Strict):
                 )
             if shot.location not in self.locations:
                 issues.append(f"{shot.id}: unknown location '{shot.location}'")
+        for char in self.characters.values():
+            for costume in char.costume_references:
+                if costume not in char.costumes:
+                    issues.append(f"{char.id}: costume_references names unknown costume '{costume}'")
+        if self._dir is not None:
+            for owner, ref in self._all_refs():
+                if not self.ref_path(ref).is_file():
+                    issues.append(f"{owner}: reference image not found: {ref}")
         return issues
+
+    def _all_refs(self):
+        for char in self.characters.values():
+            yield from ((char.id, r) for r in char.reference_images)
+            for refs in char.costume_references.values():
+                yield from ((char.id, r) for r in refs)
+        for loc in self.locations.values():
+            yield from ((loc.id, r) for r in loc.reference_images)
 
 
 def _load_dir(folder: Path, model: type[BaseModel]) -> dict:
@@ -113,10 +136,12 @@ def _load_dir(folder: Path, model: type[BaseModel]) -> dict:
 
 def load_bible(bible_dir: Path) -> Bible:
     shots_file = yaml.safe_load((bible_dir / "shots.yaml").read_text())
-    return Bible(
+    bible = Bible(
         style=shots_file["style"],
         camera_defaults=Camera.model_validate(shots_file.get("camera_defaults") or {}),
         characters=_load_dir(bible_dir / "characters", Character),
         locations=_load_dir(bible_dir / "locations", Location),
         shots=[Shot.model_validate(s) for s in shots_file["shots"]],
     )
+    bible._dir = bible_dir
+    return bible
