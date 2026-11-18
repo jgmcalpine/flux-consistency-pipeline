@@ -1,4 +1,4 @@
-"""Command line: fluxpipe validate | prompts | diff | generate | baseline | refs | lock | credits | budget"""
+"""Command line: fluxpipe validate | prompts | diff | generate | baseline | score | refs | lock | credits | budget"""
 
 from __future__ import annotations
 
@@ -163,6 +163,49 @@ def baseline(
             raise typer.Exit(1)
         tag = f"(dry run, ledger row {result.ledger_id}) " if result.dry_run else ""
         typer.echo(f"  {tag}{out.relative_to(root)}  ~${req.est_cost_usd:.3f}")
+
+
+@app.command()
+def score(
+    folder: Path = typer.Argument(..., help="A folder of stills, e.g. results/baseline"),
+    character: str = typer.Option("ismael", help="Whose locked face to compare against."),
+) -> None:
+    """Face identity QA: cosine similarity of each still's face to the locked face. Free (runs locally)."""
+    from .qa.face import SAME_PERSON, SMALL_FACE_PX, insightface_detector, score_images
+
+    settings = load_settings()
+    bible = load_bible(settings.bible_dir)
+    char = bible.characters.get(character)
+    if char is None or not char.reference_images:
+        typer.secho(f"  x no locked face for '{character}'", fg="red")
+        raise typer.Exit(2)
+    images = sorted(p for p in folder.glob("*.png"))
+    if not images:
+        typer.secho(f"  x no .png files in {folder}", fg="red")
+        raise typer.Exit(2)
+
+    typer.echo("Loading InsightFace (buffalo_l)...")
+    scores, pairs = score_images(insightface_detector(), bible.ref_path(char.reference_images[0]), images)
+    colour = {"same": "green", "different": "red", "too small": "yellow", "no face": "yellow"}
+    for sc in scores:
+        sim = f"{sc.similarity:.3f}" if sc.similarity is not None else "  -  "
+        px = f"{sc.height_px}px" if sc.height_px else "-"
+        typer.secho(f"  {sc.image:<32} {sim}  face {px:>6}  {sc.verdict}", fg=colour[sc.verdict])
+    judged = [sc.similarity for sc in scores if sc.verdict in ("same", "different")]
+    if judged:
+        typer.echo(f"Mean over {len(judged)} judgeable face(s): {sum(judged) / len(judged):.3f}"
+                   f"  (same person >= {SAME_PERSON}; faces under {SMALL_FACE_PX}px not judged)")
+    if pairs:
+        typer.echo(f"Shot vs shot ({len(pairs)} pairs): mean {sum(pairs) / len(pairs):.3f},"
+                   f" min {min(pairs):.3f}, max {max(pairs):.3f}  (is it the same man in every shot?)")
+    out = folder / "faces.json"
+    out.write_text(json.dumps({
+        "reference": char.reference_images[0],
+        "same_person_threshold": SAME_PERSON,
+        "shots": [sc.as_dict() for sc in scores],
+        "pairwise": pairs,
+    }, indent=2) + "\n")
+    typer.secho(f"  wrote {out}", dim=True)
 
 
 @app.command()

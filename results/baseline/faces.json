@@ -1,0 +1,124 @@
+{
+  "reference": "refs/ismael/face.png",
+  "same_person_threshold": 0.5,
+  "shots": [
+    {
+      "image": "s01_flux-2-pro_s661535186.png",
+      "faces": 1,
+      "similarity": 0.259,
+      "height_px": 150,
+      "det_score": 0.851,
+      "verdict": "different"
+    },
+    {
+      "image": "s02_flux-2-pro_s3194447976.png",
+      "faces": 1,
+      "similarity": 0.265,
+      "height_px": 157,
+      "det_score": 0.846,
+      "verdict": "different"
+    },
+    {
+      "image": "s03_flux-2-pro_s3378534654.png",
+      "faces": 0,
+      "similarity": null,
+      "height_px": null,
+      "det_score": null,
+      "verdict": "no face"
+    },
+    {
+      "image": "s04_flux-2-pro_s1459932509.png",
+      "faces": 1,
+      "similarity": 0.251,
+      "height_px": 202,
+      "det_score": 0.637,
+      "verdict": "different"
+    },
+    {
+      "image": "s05_flux-2-pro_s537132491.png",
+      "faces": 1,
+      "similarity": 0.092,
+      "height_px": 57,
+      "det_score": 0.726,
+      "verdict": "too small"
+    },
+    {
+      "image": "s06_flux-2-pro_s3104484465.png",
+      "faces": 1,
+      "similarity": 0.16,
+      "height_px": 75,
+      "det_score": 0.828,
+      "verdict": "too small"
+    },
+    {
+      "image": "s07_flux-2-pro_s3456998631.png",
+      "faces": 1,
+      "similarity": 0.167,
+      "height_px": 114,
+      "det_score": 0.836,
+      "verdict": "different"
+    },
+    {
+      "image": "s08_flux-2-pro_s1588756854.png",
+      "faces": 1,
+      "similarity": 0.257,
+      "height_px": 193,
+      "det_score": 0.804,
+      "verdict": "different"
+    },
+    {
+      "image": "s09_flux-2-pro_s699773408.png",
+      "faces": 1,
+      "similarity": 0.33,
+      "height_px": 202,
+      "det_score": 0.757,
+      "verdict": "different"
+    },
+    {
+      "image": "s10_flux-2-pro_s1232222213.png",
+      "faces": 1,
+      "similarity": 0.184,
+      "height_px": 281,
+      "det_score": 0.639,
+      "verdict": "different"
+    },
+    {
+      "image": "s11_flux-2-pro_s1047857299.png",
+      "faces": 1,
+      "similarity": 0.199,
+      "height_px": 149,
+      "det_score": 0.845,
+      "verdict": "different"
+    }
+  ],
+  "pairwise": [
+    0.303,
+    0.3,
+    0.33,
+    0.287,
+    0.443,
+    0.268,
+    0.319,
+    0.352,
+    0.305,
+    0.246,
+    0.372,
+    0.287,
+    0.329,
+    0.266,
+    0.398,
+    0.326,
+    0.247,
+    0.28,
+    0.28,
+    0.413,
+    0.278,
+    0.267,
+    0.389,
+    0.269,
+    0.448,
+    0.329,
+    0.405,
+    0.205
+  ]
+}
