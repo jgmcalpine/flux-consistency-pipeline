@@ -6,6 +6,8 @@ Three kinds, made in this order:
          so every costume sheet shows the same person.
   plate  a location with no people in it, in its own lighting.
   prop   one story object alone on a plain background, so its shape and colour are fixed.
+         `--with other_prop` attaches another locked prop and shows it lying beside this one,
+         so the two fit each other (a necklace sized for its crystal) without naming it in words.
 
 Candidates go to assets/refs/<id>/ (git-ignored). `fluxpipe lock` copies the one you
 choose into bible/refs/<id>/ (committed) and records it in the bible YAML. From then on
@@ -43,8 +45,8 @@ class Candidate:
     out: Path
 
 
-def _seed(kind: str, target: str, costume: str | None, i: int) -> int:
-    return zlib.crc32(f"{kind}:{target}:{costume or ''}".encode()) + i
+def _seed(kind: str, target: str, costume: str | None, i: int, extra: str = "") -> int:
+    return zlib.crc32(f"{kind}:{target}:{costume or ''}{extra}".encode()) + i
 
 
 def _face_prompt(bible: Bible, char_id: str) -> dict:
@@ -93,13 +95,20 @@ def _plate_prompt(bible: Bible, loc_id: str) -> dict:
     }
 
 
-def _prop_prompt(bible: Bible, prop_id: str) -> dict:
+def _prop_prompt(bible: Bible, prop_id: str, companions: list[str]) -> dict:
     prop = bible.props[prop_id]
+    subjects = [{"description": prop.description, "position": "centre frame"}]
+    for i, other in enumerate(companions, 1):
+        subjects.append({
+            "description": f"exactly the object shown in image {i}: {bible.props[other].description}",
+            "position": "lying loose on the surface beside it, separate, not attached",
+        })
+    what = "a single object" if not companions else "these objects side by side, showing how they fit together"
     return {
         **STUDIO,
-        "subjects": [{"description": prop.description, "position": "centre frame"}],
+        "subjects": subjects,
         "lighting": "soft, even studio light, a gentle shadow beneath the object",
-        "composition": "product photograph of a single object, filling the middle of the frame, nothing else",
+        "composition": f"product photograph of {what}, filling the middle of the frame, nothing else",
         "camera": {"angle": "slightly above", "lens": "100mm macro", "depth_of_field": "the whole object sharp"},
     }
 
@@ -107,9 +116,13 @@ def _prop_prompt(bible: Bible, prop_id: str) -> dict:
 def candidates(
     bible: Bible, kind: str, target: str, *, out_dir: Path, n: int, model: str,
     costume: str | None = None,
+    with_props: list[str] | None = None,
 ) -> list[Candidate]:
     """The requests for n candidates of one reference (nothing is sent here)."""
     refs: list[Path] = []
+    with_props = with_props or []
+    if with_props and kind != "prop":
+        raise ValueError("--with only applies to props")
     if kind == "face":
         prompt = _face_prompt(bible, _character(bible, target))
     elif kind == "sheet":
@@ -127,7 +140,13 @@ def candidates(
     elif kind == "prop":
         if target not in bible.props:
             raise ValueError(f"No prop '{target}'. Props: {', '.join(bible.props) or '(none)'}")
-        prompt = _prop_prompt(bible, target)
+        for other in with_props:
+            if other not in bible.props or other == target:
+                raise ValueError(f"--with needs another prop id. Props: {', '.join(bible.props)}")
+            if not bible.props[other].reference_images:
+                raise ValueError(f"Lock '{other}' first: --with attaches its locked image.")
+            refs.append(bible.ref_path(bible.props[other].reference_images[0]))
+        prompt = _prop_prompt(bible, target, with_props)
     else:
         raise ValueError("kind must be face, sheet, plate or prop")
 
@@ -135,7 +154,7 @@ def candidates(
     label = f"{kind}-{costume}" if costume else kind
     out = []
     for i in range(n):
-        seed = _seed(kind, target, costume, i)
+        seed = _seed(kind, target, costume, i, extra="+".join(with_props))
         req = build_request(model, prompt, width=width, height=height, seed=seed, ref_files=refs)
         out.append(Candidate(kind, target, costume, req, out_dir / target / f"{label}_s{seed}.png"))
     return out

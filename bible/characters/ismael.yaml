@@ -21,4 +21,8 @@ costumes:
     a pair of shorts in color #9C8084, simple brown rope sandals
 
 # Locked at M3 with `fluxpipe lock`: the face, then one sheet per costume.
-reference_images: []
+reference_images:
+- refs/ismael/face.png
+costume_references:
+  beachwear:
+  - refs/ismael/sheet-beachwear.png

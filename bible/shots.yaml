@@ -121,7 +121,7 @@ shots:
     framing: close-up of the worktable, his hands entering the frame
     camera: { angle: slightly above, lens: 50mm }
     position: the necklace in the centre of the table
-    action: he lifts a cloth to reveal the necklace, its four-claw setting empty
+    action: he lifts a cloth to reveal the necklace, its copper cage empty
     mood: anticipation
     duration_s: 5
 
@@ -133,7 +133,7 @@ shots:
     framing: extreme close-up of his hands, the necklace and the crystal
     camera: { angle: slightly above, lens: 100mm macro }
     position: hands in the centre of the frame
-    action: his fingers press the crystal into the empty setting and fold the copper claws over it
+    action: his fingers slide the crystal into the empty copper cage and press the prongs closed around it
     mood: careful, precise
     duration_s: 5
 
@@ -144,6 +144,6 @@ shots:
     props: [necklace, crystal]
     framing: medium wide shot of the hammock and the fire
     position: lying in the hammock, right of frame, the fire in the foreground on the left
-    action: he rests in the hammock holding the finished necklace, the green crystal now set in its claws, his eyes closing
+    action: he rests in the hammock holding the finished necklace, the green crystal now held in its copper cage, his eyes closing
     mood: peaceful, complete
     duration_s: 5

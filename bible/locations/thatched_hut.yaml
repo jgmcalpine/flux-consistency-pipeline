@@ -6,4 +6,5 @@ description: >-
   with copper wire, beads, small polished river stones and small hand tools on it
 lighting: cold blue night outside, warm amber glow from the fire
 palette: ["#1d2a3a", "#c98a3c", "#e9d8a6"]
-reference_images: []
+reference_images:
+- refs/thatched_hut/plate.png

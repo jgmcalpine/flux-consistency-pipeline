@@ -5,6 +5,7 @@ import struct
 import zlib
 
 import pytest
+from ruamel.yaml import YAML
 
 from fluxpipe.bible import load_bible
 from fluxpipe.config import ROOT, estimate_cost
@@ -34,6 +35,15 @@ def bible_dir(tmp_path):
     """A throwaway copy of the bible, so lock() never touches the real one."""
     d = tmp_path / "bible"
     shutil.copytree(ROOT / "bible", d, ignore=shutil.ignore_patterns("refs"))
+    # Start from nothing locked, whatever the real bible has locked so far.
+    yaml = YAML()
+    for f in d.glob("*/*.yaml"):
+        data = yaml.load(f.read_text())
+        if isinstance(data, dict) and "reference_images" in data:
+            data["reference_images"] = []
+            data.pop("costume_references", None)
+            with f.open("w") as out:
+                yaml.dump(data, out)
     return d
 
 
@@ -144,3 +154,20 @@ def test_prop_reference_is_locked_and_attached_with_its_own_image_number(bible_d
     assert bible.props[prop_id].reference_images == [f"refs/{prop_id}/prop.png"]
     subjects = build_structured(bible, bible.shot(shot.id))["subjects"]
     assert any(s["description"].startswith("exactly the object shown in image 1") for s in subjects)
+
+
+def test_prop_with_another_locked_prop_attaches_it_beside(bible_dir, tmp_path):
+    bible = load_bible(bible_dir)
+    first, second = list(bible.props)[:2]
+    with pytest.raises(ValueError, match="Lock"):
+        candidates(bible, "prop", second, out_dir=tmp_path, n=1, model="flux-2-pro", with_props=[first])
+    first_cand = candidates(bible, "prop", first, out_dir=tmp_path, n=1, model="flux-2-pro")[0]
+    lock(bible, bible_dir, tiny_png(first_cand.out, 992, 992))
+    bible = load_bible(bible_dir)
+    cand = candidates(bible, "prop", second, out_dir=tmp_path, n=1, model="flux-2-pro", with_props=[first])[0]
+    assert base64.b64decode(cand.request.payload["input_image"]) == first_cand.out.read_bytes()
+    subjects = json.loads(cand.request.payload["prompt"])["subjects"]
+    assert subjects[1]["description"].startswith("exactly the object shown in image 1")
+    assert "beside" in subjects[1]["position"]
+    plain = candidates(bible, "prop", second, out_dir=tmp_path, n=1, model="flux-2-pro")[0]
+    assert plain.out != cand.out  # new seeds, so earlier candidates are never overwritten

@@ -5,4 +5,5 @@ description: >-
   with exposed tree roots and ferns at the water's edge, dense green canopy overhead
 lighting: late afternoon, warm sun breaking through the canopy in shafts, dappled light on the water
 palette: ["#3E5B3A", "#B08A4F", "#7FA3A0", "#2A2F26"]
-reference_images: []
+reference_images:
+- refs/riverbank/plate.png

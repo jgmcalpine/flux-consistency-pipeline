@@ -69,7 +69,7 @@ def test_props_are_described_word_for_word_in_every_shot_that_shows_them(bible):
     for shot in shots_with_props:
         descriptions = [x["description"] for x in build_structured(bible, shot)["subjects"][1:]]
         for prop_id in shot.props:
-            assert bible.props[prop_id].description in descriptions
+            assert any(bible.props[prop_id].description in d for d in descriptions)
 
 
 def test_unknown_prop_is_caught(bible):

@@ -1,8 +1,13 @@
-# Described without its state: whether the setting is empty or holds the crystal is
-# said in each shot's action. When locking its reference, pick a candidate with an EMPTY setting.
+# Described without its state: whether the cage is empty or holds the crystal is said in each
+# shot's action. Never name the crystal here: every noun gets drawn. To size it for the crystal,
+# generate it with the crystal attached: `fluxpipe refs prop necklace --with crystal`.
+# When locking, pick a candidate whose cage is EMPTY (the crystal lying beside it is fine).
 id: necklace
 name: Copper necklace
 description: >-
-  a handmade pendant of braided copper wire in color #B87333 with a four-claw setting
-  at its centre, hung on a dark brown leather cord
-reference_images: []
+  a handmade pendant: a narrow open cage of four braided copper wire prongs in color #B87333,
+  about the length of a thumb, hanging from a small loop on a dark brown leather cord; the
+  prongs run downward and curve inward at the bottom, and the cage is hollow, with the
+  background visible through it
+reference_images:
+- refs/necklace/prop.png

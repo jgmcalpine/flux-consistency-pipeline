@@ -127,6 +127,7 @@ def refs(
     kind: str = typer.Argument(..., help="face | sheet | plate | prop"),
     target: str = typer.Argument(..., help="Character id (face, sheet), location id (plate) or prop id (prop)."),
     costume: str = typer.Option(None, help="For sheet: which costume."),
+    with_: list[str] = typer.Option(None, "--with", help="For prop: a locked prop to show beside it."),
     n: int = typer.Option(4, help="How many candidates (different seeds) to make."),
     model: str = typer.Option("flux-2-pro"),
 ) -> None:
@@ -135,7 +136,8 @@ def refs(
     bible = load_bible(settings.bible_dir)
     try:
         cands = ref_candidates(
-            bible, kind, target, out_dir=settings.assets_dir / "refs", n=n, model=model, costume=costume
+            bible, kind, target, out_dir=settings.assets_dir / "refs", n=n, model=model,
+            costume=costume, with_props=with_,
         )
     except (ValueError, KeyError) as exc:
         typer.secho(f"  x {exc}", fg="red")
