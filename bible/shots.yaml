@@ -12,33 +12,33 @@ camera_defaults:
 shots:
   - id: s01
     character: keeper
-    costume: storm_coat
+    costume: beachwear
     location: cliff_path
     framing: wide shot, subject small in the lower third
     camera: { lens: 24mm, depth_of_field: "deep, everything in focus" }
     position: walking along the path, left of centre
-    action: she walks toward the lighthouse, leaning into the wind
-    mood: determined, lonely
+    action: he walks toward the thatched hut, leaning into the wind
+    mood: determined, peaceful
     duration_s: 5
 
   - id: s02
     character: keeper
-    costume: storm_coat
+    costume: beachwear
     location: cliff_path
     framing: medium close-up, head and shoulders
     camera: { lens: 85mm }
-    position: centre frame, facing the sea
-    action: she stops and looks out to sea, squinting
+    position: centre frame, facing the jungle
+    action: he stops and looks out over the jungle, squinting
     mood: uneasy
     duration_s: 5
 
   - id: s03
     character: keeper
     costume: indoor
-    location: lantern_room
-    framing: close-up of her face beside the lens
+    location: thatched_hut
+    framing: close-up of his face above the fire
     camera: { angle: slightly low, lens: 50mm }
-    position: right of frame, the lens filling the left
-    action: she polishes the brass lens, her reflection distorted in the glass
+    position: right of frame, the jewelry and tools on the floor filling the left
+    action: he polishes a necklace he has been making, his reflection distorted in the large crystal at the center of the necklace
     mood: calm, private
     duration_s: 5

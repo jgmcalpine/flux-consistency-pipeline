@@ -101,7 +101,6 @@ def generate(
     typer.echo(f"{shot}: {model} {width}x{height} seed {seed_used}, estimated ${req.est_cost_usd:.3f}")
 
     client = BFLClient(settings.api_key, ledger, dry_run=settings.dry_run)
-    before = None if settings.dry_run else client.credits()
     try:
         result = client.run_job(
             endpoint=req.endpoint, payload=req.payload, est_cost_usd=req.est_cost_usd,
@@ -117,8 +116,7 @@ def generate(
     typer.secho(f"  saved {out.relative_to(settings.assets_dir.parent)}", fg="green")
     reported = f"${result.actual_cost_usd:.3f}" if result.actual_cost_usd is not None else "not reported"
     typer.echo(f"  cost: estimated ${req.est_cost_usd:.3f}, BFL reported {reported}")
-    after = client.credits()
-    typer.echo(f"  credits: {before:.2f} -> {after:.2f} (used {before - after:.2f} = ${(before - after) / 100:.3f})")
+    typer.secho("  (the balance from `fluxpipe credits` takes a minute or two to catch up)", dim=True)
 
 
 @app.command()

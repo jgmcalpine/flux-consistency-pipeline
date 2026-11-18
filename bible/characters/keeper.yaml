@@ -4,24 +4,24 @@
 # "deep-set grey eyes" survives 10 generations; "kind eyes" drifts on the 2nd.
 # One unusual mark (a scar, a streak of colour) gives you and the QA step an anchor.
 id: keeper
-name: Ines Calder
+name: Ismael Calder
 identity:
-  who: a woman lighthouse keeper
-  age: in her late 50s
+  who: a man who is an artist living in the jungle
+  age: in his early 40s
   build: tall and wiry, slightly stooped shoulders
-  face: weathered tan skin, deep-set grey eyes, high cheekbones, deep laugh lines
-  hair: silver hair in a single short braid
-  marks: a thin pale scar through her left eyebrow
+  face: weathered tan skin, deep-set brown-green eyes, high cheekbones, deep laugh lines, short dark beard flecked with grey, neatly trimmed
+  hair: brown hair with streaks of grey worn in dreadlocks tied back with a plain dark green bandana with no pattern
+  marks: a thin pale scar through his left eyebrow
 
 # costumes = what CAN change, but only between scenes, never within one.
 # Hex codes pin colours exactly (FLUX.2 reads "in color #RRGGBB").
 costumes:
-  storm_coat: >-
-    a long oilskin coat in color #C9A227 with brass toggles,
-    a navy knit scarf in color #1F2A44, black rubber boots
+  beachwear: >-
+    a tank top in color #1A6DBD with a circle of color #D2E312 on the front,
+    a pair of shorts in color #9C8084, black sandals
   indoor: >-
-    a cream cable-knit fisherman's sweater in color #EFE6D2 with rolled sleeves,
-    dark canvas trousers
+    a light blue short-sleeved shirt in color #A1D3F0 with a circle of color #D2E312 on the front,
+    a pair of dark blue pants in color #9C8084, black sandals
 
 # Filled in at M3 with the paths of the reference images you lock.
 reference_images: []

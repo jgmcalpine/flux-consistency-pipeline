@@ -1,0 +1,8 @@
+id: thatched_hut
+name: Thatched hut
+description: >-
+  a thatched hut with a thatched roof and walls, a small fire in the centre, a hammock hanging from the rafters.
+  There are tools and a few plants scattered around the hut.
+lighting: cold blue night outside, warm amber glow from the fire
+palette: ["#1d2a3a", "#c98a3c", "#e9d8a6"]
+reference_images: []

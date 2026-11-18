@@ -1,8 +1,0 @@
-id: lantern_room
-name: Lantern room
-description: >-
-  the circular glass room at the top of a stone lighthouse, a huge brass
-  Fresnel lens in the centre, rain streaking the windows
-lighting: cold blue night outside, warm amber glow from the lamp, hard rim light
-palette: ["#1d2a3a", "#c98a3c", "#e9d8a6"]
-reference_images: []
