@@ -1,0 +1,55 @@
+# M4: the naive baseline, the "before" half of the demo.
+#
+# This is how a careful person would prompt WITHOUT the pipeline: one plain-English prompt per
+# shot, the same short character description pasted into every one, same model, size and seed
+# as the pipeline's keyframes. What it leaves out is what the pipeline adds: reference images,
+# the structured JSON prompt, hex colours, and the full word-for-word identity and prop text.
+#
+# It's deliberately NOT a strawman. The claim we test is "words alone don't hold a face across
+# 11 images, references do", so the words here should be as good as a normal user would write.
+#
+# Final prompt = "<character> <shot> <style>". Write each shot as one or two plain sentences that
+# continue from the character ("He ..."). Every shot id in shots.yaml needs an entry here.
+
+character: >-
+  Ismael, a tall, wiry jewelry maker in his early 40s with weathered tan skin, a short dark
+  beard flecked with grey, and grey-streaked brown dreadlocks tied back with a dark green
+  bandana. He has a thin scar through his left eyebrow. He wears a dark grey tank top with a
+  mustard-yellow circle on the front, dusty pink shorts and rope sandals.
+
+style: Cinematic film still, 35mm, natural light.
+
+shots:
+  s01: >-
+    He crouches at the edge of a shallow jungle river in the late afternoon, sifting gravel in a
+    metal pan, a canvas satchel on the bank behind him. Wide shot, the river filling the frame.
+  s02: >-
+    At the jungle riverbank he holds the metal pan and suddenly goes still, leaning closer to
+    look into it. Medium shot, waist up, facing the camera.
+  s03: >-
+    Close-up of his wet hands lifting a raw green crystal out of the gravel in the pan, water
+    running off it. His face is out of frame.
+  s04: >-
+    He smiles, slips the green crystal into his canvas satchel and lifts the strap onto his
+    shoulder, on the riverbank. Head-and-shoulders close-up, three-quarter view.
+  s05: >-
+    He walks left to right up a winding dirt path through dense jungle at golden hour, the
+    satchel on his shoulder. Wide shot, the man small in the frame.
+  s06: >-
+    He walks left to right toward a small thatched hut at dusk, warm firelight glowing in its
+    doorway. Wide shot.
+  s07: >-
+    Inside his thatched hut at night, he drops his satchel on the floor and sits down at a small
+    worktable covered in copper wire and beads, lit by a fire. Medium shot.
+  s08: >-
+    Inside his hut at night, he holds the raw green crystal up to the firelight and turns it,
+    smiling. Close-up of his face and the crystal.
+  s09: >-
+    Close-up of a worktable at night, his hands lifting a cloth to reveal a copper wire pendant
+    on a leather cord, its wire cage empty.
+  s10: >-
+    Extreme close-up of his fingers sliding the raw green crystal into the empty copper wire cage
+    of a pendant and pressing the wire prongs closed around it.
+  s11: >-
+    Inside his hut at night, he lies in a hammock holding the finished copper pendant with the
+    green crystal in it, his eyes closing, a small fire in the foreground. Medium wide shot.

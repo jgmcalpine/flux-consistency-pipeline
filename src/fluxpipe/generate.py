@@ -47,9 +47,10 @@ def check_size(width: int, height: int) -> None:
 
 
 def build_request(
-    model: str, prompt: dict, *, width: int, height: int, seed: int, ref_files: list[Path]
+    model: str, prompt: dict | str, *, width: int, height: int, seed: int, ref_files: list[Path]
 ) -> Request:
-    """One FLUX.2 request: the JSON prompt, size, seed, references as input_image, input_image_2..."""
+    """One FLUX.2 request: the prompt (JSON, or plain text for the baseline), size, seed,
+    references as input_image, input_image_2..."""
     if model not in IMAGE_PRICES_USD:
         raise ValueError(f"Unknown model '{model}'. Known: {', '.join(IMAGE_PRICES_USD)}")
     check_size(width, height)
@@ -57,7 +58,7 @@ def build_request(
     if len(ref_files) > max_refs:
         raise ValueError(f"{model} takes at most {max_refs} reference images, got {len(ref_files)}")
     payload = {
-        "prompt": as_json(prompt),
+        "prompt": prompt if isinstance(prompt, str) else as_json(prompt),
         "width": width,
         "height": height,
         "seed": seed,
@@ -91,4 +92,29 @@ def keyframe_request(
         height=height,
         seed=shot_seed(shot.id) if seed is None else seed,
         ref_files=[bible.ref_path(r) for r in reference_images(bible, shot)],
+    )
+
+
+BASELINE_MODEL = "flux-2-pro"  # same model as the keyframes, or the comparison isn't fair
+
+
+def baseline_request(
+    bible: Bible,
+    shot: Shot,
+    *,
+    model: str = BASELINE_MODEL,
+    width: int = DEFAULT_SIZE[0],
+    height: int = DEFAULT_SIZE[1],
+) -> Request:
+    """M4: the naive "before" shot. Same model, size and seed as the pipeline's keyframe, so the
+    only differences are the ones the pipeline adds: references and the structured bible prompt."""
+    if bible.baseline is None:
+        raise ValueError("No bible/baseline.yaml")
+    return build_request(
+        model,
+        bible.baseline.prompt(shot.id),
+        width=width,
+        height=height,
+        seed=shot_seed(shot.id),
+        ref_files=[],
     )

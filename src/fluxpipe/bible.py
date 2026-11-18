@@ -76,6 +76,19 @@ class Shot(Strict):
     duration_s: float = 5
 
 
+class Baseline(Strict):
+    """M4: plain prompts for the naive "before" run. No references, no JSON, no hex colours."""
+
+    character: str  # one short description, pasted into every prompt
+    style: str
+    shots: dict[str, str]  # shot id -> one or two plain sentences ("He ...")
+
+    def prompt(self, shot_id: str) -> str:
+        if shot_id not in self.shots:
+            raise KeyError(f"No baseline prompt for '{shot_id}' in baseline.yaml")
+        return f"{self.character} {self.shots[shot_id]} {self.style}"
+
+
 class Bible(Strict):
     style: str
     camera_defaults: Camera
@@ -83,6 +96,7 @@ class Bible(Strict):
     locations: dict[str, Location]
     props: dict[str, Prop] = Field(default_factory=dict)
     shots: list[Shot]
+    baseline: Baseline | None = None
     _dir: Path | None = PrivateAttr(default=None)
 
     def ref_path(self, ref: str) -> Path:
@@ -121,6 +135,12 @@ class Bible(Strict):
             for prop in shot.props:
                 if prop not in self.props:
                     issues.append(f"{shot.id}: unknown prop '{prop}'")
+        if self.baseline is not None:
+            ids = {s.id for s in self.shots}
+            for missing in sorted(ids - self.baseline.shots.keys()):
+                issues.append(f"baseline.yaml: no prompt for shot '{missing}'")
+            for extra in sorted(self.baseline.shots.keys() - ids):
+                issues.append(f"baseline.yaml: unknown shot '{extra}'")
         for char in self.characters.values():
             for costume in char.costume_references:
                 if costume not in char.costumes:
@@ -148,6 +168,10 @@ def _load_dir(folder: Path, model: type[BaseModel]) -> dict:
     return items
 
 
+def _load_baseline(path: Path) -> Baseline | None:
+    return Baseline.model_validate(yaml.safe_load(path.read_text())) if path.is_file() else None
+
+
 def load_bible(bible_dir: Path) -> Bible:
     shots_file = yaml.safe_load((bible_dir / "shots.yaml").read_text())
     bible = Bible(
@@ -157,6 +181,7 @@ def load_bible(bible_dir: Path) -> Bible:
         locations=_load_dir(bible_dir / "locations", Location),
         props=_load_dir(bible_dir / "props", Prop),
         shots=[Shot.model_validate(s) for s in shots_file["shots"]],
+        baseline=_load_baseline(bible_dir / "baseline.yaml"),
     )
     bible._dir = bible_dir
     return bible

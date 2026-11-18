@@ -1,4 +1,4 @@
-"""Command line: fluxpipe validate | prompts | diff | generate | refs | lock | credits | budget"""
+"""Command line: fluxpipe validate | prompts | diff | generate | baseline | refs | lock | credits | budget"""
 
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ import typer
 from .bfl_client import BFLClient, BFLError
 from .bible import load_bible
 from .config import IMAGE_PRICES_USD, load_settings
-from .generate import DEFAULT_MODEL, DEFAULT_SIZE, keyframe_request
+from .generate import BASELINE_MODEL, DEFAULT_MODEL, DEFAULT_SIZE, baseline_request, keyframe_request
 from .ledger import Ledger, SpendCapExceeded
 from .refs import candidates as ref_candidates
 from .refs import lock as lock_ref
@@ -46,12 +46,21 @@ def validate() -> None:
 def prompts(
     shot: str = typer.Option(None, help="Only this shot id."),
     as_: str = typer.Option("text", "--as", help="text (readable) or json (what the API gets)."),
+    baseline: bool = typer.Option(False, "--baseline", help="Show the naive M4 prompts instead."),
 ) -> None:
     """Print the prompt (and attached references) each shot will be generated from."""
     settings = load_settings()
     bible = load_bible(settings.bible_dir)
     for s in bible.shots:
         if shot and s.id != shot:
+            continue
+        if baseline:
+            if bible.baseline is None:
+                typer.secho("  x no bible/baseline.yaml", fg="red")
+                raise typer.Exit(2)
+            typer.secho(f"[{s.id}] baseline", bold=True)
+            typer.echo(bible.baseline.prompt(s.id))
+            typer.secho("  refs: none (that's the point)\n", dim=True)
             continue
         structured = build_structured(bible, s)
         typer.secho(f"[{s.id}] {s.duration_s:g}s", bold=True)
@@ -120,6 +129,40 @@ def generate(
     reported = f"${result.actual_cost_usd:.3f}" if result.actual_cost_usd is not None else "not reported"
     typer.echo(f"  cost: estimated ${req.est_cost_usd:.3f}, BFL reported {reported}")
     typer.secho("  (the balance from `fluxpipe credits` takes a minute or two to catch up)", dim=True)
+
+
+@app.command()
+def baseline(
+    shot: str = typer.Option(None, help="Only this shot id (default: all of them)."),
+    model: str = typer.Option(BASELINE_MODEL, help="Keep it the same as the keyframes'."),
+) -> None:
+    """M4: the naive "before" stills. Plain prompts, no references, same model/size/seed as keyframes."""
+    settings = load_settings()
+    bible = load_bible(settings.bible_dir)
+    try:
+        shots = [bible.shot(shot)] if shot else bible.shots
+        reqs = [(s, baseline_request(bible, s, model=model)) for s in shots]
+    except (ValueError, KeyError) as exc:
+        typer.secho(f"  x {exc}", fg="red")
+        raise typer.Exit(2)
+    total = sum(r.est_cost_usd for _, r in reqs)
+    typer.echo(f"{len(reqs)} baseline still(s) on {model}: ~${total:.3f}")
+
+    client = BFLClient(settings.api_key, Ledger(settings.ledger_path, settings.spend_cap_usd),
+                       dry_run=settings.dry_run)
+    root = settings.assets_dir.parent
+    for s, req in reqs:
+        out = settings.assets_dir / "baseline" / f"{s.id}_{model}_s{req.payload['seed']}.png"
+        try:
+            result = client.run_job(
+                endpoint=req.endpoint, payload=req.payload, est_cost_usd=req.est_cost_usd,
+                stage="baseline", out_path=out, shot_id=s.id,
+            )
+        except (SpendCapExceeded, BFLError) as exc:
+            typer.secho(f"  x {s.id}: {exc}", fg="red")
+            raise typer.Exit(1)
+        tag = f"(dry run, ledger row {result.ledger_id}) " if result.dry_run else ""
+        typer.echo(f"  {tag}{out.relative_to(root)}  ~${req.est_cost_usd:.3f}")
 
 
 @app.command()
