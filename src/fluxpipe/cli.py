@@ -1,4 +1,4 @@
-"""Command line: fluxpipe validate | prompts | diff | budget"""
+"""Command line: fluxpipe validate | prompts | diff | generate | credits | budget"""
 
 from __future__ import annotations
 
@@ -6,15 +6,18 @@ import json
 
 import typer
 
+from .bfl_client import BFLClient, BFLError
 from .bible import load_bible
-from .config import load_settings
-from .ledger import Ledger
+from .config import IMAGE_PRICES_USD, load_settings
+from .generate import DEFAULT_MODEL, DEFAULT_SIZE, keyframe_request
+from .ledger import Ledger, SpendCapExceeded
 from .prompts import _flatten, as_text, build_structured, reference_images
 from .prompts import diff as prompt_diff
 
 
 def _all_fields(a: dict, b: dict) -> set[str]:
     return _flatten(a).keys() | _flatten(b).keys()
+
 
 app = typer.Typer(help="A consistency pipeline for FLUX.", no_args_is_help=True)
 
@@ -71,6 +74,64 @@ def diff(shot_a: str, shot_b: str) -> None:
         typer.secho(f"  {shot_b}: {vb}", fg="green")
     same = len(_all_fields(a, b)) - len(changes)
     typer.echo(f"\n{len(changes)} field(s) differ; {same} identical.")
+
+
+@app.command()
+def generate(
+    shot: str,
+    model: str = typer.Option(DEFAULT_MODEL, help=f"One of: {', '.join(IMAGE_PRICES_USD)}."),
+    width: int = typer.Option(DEFAULT_SIZE[0]),
+    height: int = typer.Option(DEFAULT_SIZE[1]),
+    seed: int = typer.Option(None, help="Default: a fixed seed derived from the shot id."),
+    stage: str = typer.Option("test", help="Ledger stage: test | keyframe | baseline ..."),
+) -> None:
+    """Generate one still for a shot. With DRY_RUN=true it is logged but not sent."""
+    settings = load_settings()
+    bible = load_bible(settings.bible_dir)
+    ledger = Ledger(settings.ledger_path, settings.spend_cap_usd)
+    try:
+        req = keyframe_request(
+            bible, bible.shot(shot), model=model, width=width, height=height, seed=seed
+        )
+    except (ValueError, KeyError) as exc:
+        typer.secho(f"  x {exc}", fg="red")
+        raise typer.Exit(2)
+    seed_used = req.payload["seed"]
+    out = settings.assets_dir / stage / f"{shot}_{model}_s{seed_used}.png"
+    typer.echo(f"{shot}: {model} {width}x{height} seed {seed_used}, estimated ${req.est_cost_usd:.3f}")
+
+    client = BFLClient(settings.api_key, ledger, dry_run=settings.dry_run)
+    before = None if settings.dry_run else client.credits()
+    try:
+        result = client.run_job(
+            endpoint=req.endpoint, payload=req.payload, est_cost_usd=req.est_cost_usd,
+            stage=stage, out_path=out, shot_id=shot,
+        )
+    except (SpendCapExceeded, BFLError) as exc:
+        typer.secho(f"  x {exc}", fg="red")
+        raise typer.Exit(1)
+
+    if result.dry_run:
+        typer.secho(f"  dry run: logged as ledger row {result.ledger_id}, nothing sent.", fg="yellow")
+        return
+    typer.secho(f"  saved {out.relative_to(settings.assets_dir.parent)}", fg="green")
+    reported = f"${result.actual_cost_usd:.3f}" if result.actual_cost_usd is not None else "not reported"
+    typer.echo(f"  cost: estimated ${req.est_cost_usd:.3f}, BFL reported {reported}")
+    after = client.credits()
+    typer.echo(f"  credits: {before:.2f} -> {after:.2f} (used {before - after:.2f} = ${(before - after) / 100:.3f})")
+
+
+@app.command()
+def credits() -> None:
+    """Your BFL credit balance (1 credit = $0.01). Free to call."""
+    settings = load_settings()
+    client = BFLClient(settings.api_key, Ledger(settings.ledger_path, settings.spend_cap_usd))
+    try:
+        balance = client.credits()
+        typer.echo(f"{balance:.2f} credits (${balance / 100:.2f})")
+    except BFLError as exc:
+        typer.secho(f"  x {exc}", fg="red")
+        raise typer.Exit(1)
 
 
 @app.command()

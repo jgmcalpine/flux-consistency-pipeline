@@ -12,7 +12,7 @@ bible (YAML) -> canonical refs -> keyframes -> still QA -> animate -> video QA -
                       \______________ every paid call goes through the ledger ____/
 ```
 
-> Status: **M0, repo and guardrails.** No API calls yet. See the roadmap for M1-M7.
+> Status: **M2, first API call.** Structured bible and prompts (M1) done; the BFL client is wired up and tested, pending the first real call.
 
 ## Quick start
 
@@ -23,6 +23,8 @@ cp .env.example .env          # add your BFL key later (M2); DRY_RUN stays true 
 
 fluxpipe validate             # check the story bible
 fluxpipe prompts              # see the prompt every shot will use
+fluxpipe generate s01         # one still (logged only while DRY_RUN=true)
+fluxpipe credits              # BFL balance (free call, needs the key)
 fluxpipe budget               # estimated spend vs. the cap
 pytest
 ```

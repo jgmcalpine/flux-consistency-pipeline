@@ -6,6 +6,7 @@ Every paid call follows the same three steps:
   3. complete() or fail() - fills in the result
 
 A pending row counts toward spend, so a crash mid-call can never hide money from the cap.
+Once BFL reports the real cost, that replaces the estimate in the total.
 """
 
 from __future__ import annotations
@@ -19,7 +20,7 @@ SCHEMA = """
 CREATE TABLE IF NOT EXISTS generations (
     id            INTEGER PRIMARY KEY AUTOINCREMENT,
     created_at    TEXT NOT NULL,
-    stage         TEXT NOT NULL,      -- refs | keyframe | baseline | video
+    stage         TEXT NOT NULL,      -- test | refs | keyframe | baseline | video
     shot_id       TEXT,
     model         TEXT NOT NULL,
     prompt        TEXT NOT NULL,
@@ -27,6 +28,7 @@ CREATE TABLE IF NOT EXISTS generations (
     refs          TEXT NOT NULL,      -- JSON list of reference image paths
     params        TEXT NOT NULL,      -- JSON of any other request parameters
     est_cost_usd  REAL NOT NULL,
+    actual_cost_usd REAL,             -- what BFL reported; NULL until known
     status        TEXT NOT NULL,      -- pending | done | failed | dry_run
     job_id        TEXT,
     output_path   TEXT,
@@ -34,6 +36,9 @@ CREATE TABLE IF NOT EXISTS generations (
     error         TEXT
 );
 """
+
+# Columns added after M0. Old ledgers get them on open (SQLite has no ADD COLUMN IF NOT EXISTS).
+MIGRATIONS = {"actual_cost_usd": "ALTER TABLE generations ADD COLUMN actual_cost_usd REAL"}
 
 # Rows with these statuses count toward the spend cap.
 BILLABLE = ("pending", "done", "failed")
@@ -49,12 +54,18 @@ class Ledger:
         self.db = sqlite3.connect(path)
         self.db.row_factory = sqlite3.Row
         self.db.executescript(SCHEMA)
+        have = {r["name"] for r in self.db.execute("PRAGMA table_info(generations)")}
+        for column, sql in MIGRATIONS.items():
+            if column not in have:
+                self.db.execute(sql)
+        self.db.commit()
         self.cap = spend_cap_usd
 
     def total_spent(self) -> float:
         marks = ",".join("?" * len(BILLABLE))
         row = self.db.execute(
-            f"SELECT COALESCE(SUM(est_cost_usd), 0) FROM generations WHERE status IN ({marks})",
+            "SELECT COALESCE(SUM(COALESCE(actual_cost_usd, est_cost_usd)), 0)"
+            f" FROM generations WHERE status IN ({marks})",
             BILLABLE,
         ).fetchone()
         return round(row[0], 4)
@@ -100,19 +111,39 @@ class Ledger:
         self.db.commit()
         return cur.lastrowid
 
-    def complete(self, row_id: int, *, output_path: str, job_id: str | None = None) -> None:
+    def complete(
+        self,
+        row_id: int,
+        *,
+        output_path: str,
+        job_id: str | None = None,
+        actual_cost_usd: float | None = None,
+    ) -> None:
         self.db.execute(
-            "UPDATE generations SET status = 'done', output_path = ?, job_id = ? WHERE id = ?",
-            (output_path, job_id, row_id),
+            "UPDATE generations SET status = 'done', output_path = ?, job_id = ?,"
+            " actual_cost_usd = ? WHERE id = ?",
+            (output_path, job_id, actual_cost_usd, row_id),
         )
         self.db.commit()
 
-    def fail(self, row_id: int, error: str) -> None:
+    def fail(
+        self,
+        row_id: int,
+        error: str,
+        *,
+        job_id: str | None = None,
+        actual_cost_usd: float | None = None,
+    ) -> None:
         # A failed call may still have been billed, so it keeps counting toward spend.
         self.db.execute(
-            "UPDATE generations SET status = 'failed', error = ? WHERE id = ?", (error, row_id)
+            "UPDATE generations SET status = 'failed', error = ?, job_id = ?,"
+            " actual_cost_usd = ? WHERE id = ?",
+            (error, job_id, actual_cost_usd, row_id),
         )
         self.db.commit()
+
+    def last(self) -> sqlite3.Row | None:
+        return self.db.execute("SELECT * FROM generations ORDER BY id DESC LIMIT 1").fetchone()
 
     def set_score(self, row_id: int, score: float) -> None:
         self.db.execute("UPDATE generations SET qa_score = ? WHERE id = ?", (score, row_id))
@@ -120,6 +151,7 @@ class Ledger:
 
     def summary_by_stage(self) -> list[sqlite3.Row]:
         return self.db.execute(
-            "SELECT stage, status, COUNT(*) AS calls, ROUND(SUM(est_cost_usd), 2) AS usd"
+            "SELECT stage, status, COUNT(*) AS calls,"
+            " ROUND(SUM(COALESCE(actual_cost_usd, est_cost_usd)), 3) AS usd"
             " FROM generations GROUP BY stage, status ORDER BY stage, status"
         ).fetchall()
