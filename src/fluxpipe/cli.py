@@ -1,8 +1,9 @@
-"""Command line: fluxpipe validate | prompts | diff | generate | baseline | score | refs | lock | credits | budget"""
+"""Command line: fluxpipe validate | prompts | diff | generate | baseline | keyframes | score | refs | lock | credits | budget"""
 
 from __future__ import annotations
 
 import json
+import shutil
 from pathlib import Path
 
 import typer
@@ -163,6 +164,86 @@ def baseline(
             raise typer.Exit(1)
         tag = f"(dry run, ledger row {result.ledger_id}) " if result.dry_run else ""
         typer.echo(f"  {tag}{out.relative_to(root)}  ~${req.est_cost_usd:.3f}")
+
+
+@app.command()
+def keyframes(
+    shot: str = typer.Option(None, help="Only this shot id (default: all of them)."),
+    n: int = typer.Option(3, help="Candidates per round (different seeds)."),
+    max_rounds: int = typer.Option(2, help="Rounds per shot if no candidate passes face QA."),
+    model: str = typer.Option(BASELINE_MODEL, help="Keep it the same as the baseline's."),
+) -> None:
+    """M5: N candidates per shot with the locked refs; face QA picks the best; capped retries."""
+    from .keyframes import BY_EYE, DRY_RUN, PASS, run_shot, summary
+
+    settings = load_settings()
+    bible = load_bible(settings.bible_dir)
+    try:
+        shots = [bible.shot(shot)] if shot else bible.shots
+        per_call = {s.id: keyframe_request(bible, s, model=model).est_cost_usd for s in shots}
+    except (ValueError, KeyError) as exc:
+        typer.secho(f"  x {exc}", fg="red")
+        raise typer.Exit(2)
+    first = n * sum(per_call.values())
+    typer.echo(f"{len(shots)} shot(s) x {n} candidates on {model}: ~${first:.2f}"
+               f" (worst case with {max_rounds} rounds: ~${first * max_rounds:.2f})")
+
+    ledger = Ledger(settings.ledger_path, settings.spend_cap_usd)
+    client = BFLClient(settings.api_key, ledger, dry_run=settings.dry_run)
+    detect = None
+    if not settings.dry_run:
+        from .qa.face import insightface_detector, reference_face, score_one
+
+        detect = insightface_detector()
+        ref_faces: dict = {}  # character id -> its locked face's embedding
+
+        def judge_for(char_id: str):
+            if char_id not in ref_faces:
+                face_ref = bible.characters[char_id].reference_images[0]
+                ref_faces[char_id] = reference_face(detect, bible.ref_path(face_ref))
+            return lambda path: score_one(detect, ref_faces[char_id], path)[0]
+
+    work = settings.assets_dir / "keyframes"
+    picks_dir = settings.assets_dir.parent / "results" / "keyframes"
+    picks_file = picks_dir / "picks.json"
+    picks = json.loads(picks_file.read_text()) if picks_file.is_file() else {}
+    root = settings.assets_dir.parent
+    colour = {PASS: "green", BY_EYE: "yellow", DRY_RUN: "yellow"}
+
+    for s in shots:
+        def generate(seed: int, s=s) -> Path | None:
+            req = keyframe_request(bible, s, model=model, seed=seed)
+            out = work / s.id / f"{s.id}_{model}_s{seed}.png"
+            res = client.run_job(endpoint=req.endpoint, payload=req.payload,
+                                 est_cost_usd=req.est_cost_usd, stage="keyframe",
+                                 out_path=out, shot_id=s.id, refs=req.refs)
+            if res.dry_run:
+                typer.secho(f"  (dry run, ledger row {res.ledger_id}) {s.id} seed {seed}"
+                            f"  ~${req.est_cost_usd:.3f}", dim=True)
+                return None
+            return out
+
+        try:
+            result = run_shot(s.id, n=n, max_rounds=max_rounds, generate=generate,
+                              judge=judge_for(s.character) if detect else None)
+        except (SpendCapExceeded, BFLError) as exc:
+            typer.secho(f"  x {s.id}: {exc}", fg="red")
+            raise typer.Exit(1)
+        if result.status == DRY_RUN:
+            continue
+        for c in result.candidates:
+            sim = f"{c.face.similarity:.3f}" if c.face and c.face.similarity is not None else "  -  "
+            mark = "*" if c is result.pick else " "
+            typer.echo(f"   {mark} {c.path.relative_to(root)}  {sim}  {c.face.verdict if c.face else ''}")
+        typer.secho(f"  {s.id}: {result.status}", fg=colour.get(result.status, "red"), bold=True)
+        picks_dir.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(result.pick.path, picks_dir / f"{s.id}.png")
+        picks[s.id] = summary(result)
+        picks_file.write_text(json.dumps(dict(sorted(picks.items())), indent=2) + "\n")
+
+    if not settings.dry_run:
+        typer.echo(f"Picks copied to {picks_dir.relative_to(root)}/ ({picks_file.name} has every score)."
+                   f" Look at them, especially 'by eye' and 'below' shots.")
 
 
 @app.command()

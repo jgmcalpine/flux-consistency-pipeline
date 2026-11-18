@@ -90,6 +90,27 @@ def largest(faces: list[FaceHit]) -> FaceHit | None:
     return max(faces, key=lambda f: f.height_px, default=None)
 
 
+def reference_face(detect: Detector, reference: Path) -> FaceHit:
+    ref = largest(detect(reference))
+    if ref is None:
+        raise ValueError(f"No face found in the reference {reference}")
+    return ref
+
+
+def score_one(detect: Detector, ref: FaceHit, path: Path) -> tuple[FaceScore, FaceHit | None]:
+    """One image's main face vs the reference face. Also returns the face, for pairwise checks."""
+    faces = detect(path)
+    main = largest(faces)
+    score = FaceScore(
+        image=path.name,
+        faces=len(faces),
+        similarity=None if main is None else round(cosine(ref.embedding, main.embedding), 3),
+        height_px=None if main is None else main.height_px,
+        det_score=None if main is None else round(main.det_score, 3),
+    )
+    return score, main
+
+
 def score_images(
     detect: Detector, reference: Path, images: list[Path]
 ) -> tuple[list[FaceScore], list[float]]:
@@ -98,21 +119,12 @@ def score_images(
     The pairs answer a different question: not "is it OUR man?" but "is it the same man in
     every shot?". A set can fail the first and still pass the second (consistent, wrong face).
     """
-    ref = largest(detect(reference))
-    if ref is None:
-        raise ValueError(f"No face found in the reference {reference}")
+    ref = reference_face(detect, reference)
     scores, judgeable = [], []
     for path in images:
-        faces = detect(path)
-        main = largest(faces)
-        if main is not None and main.height_px >= SMALL_FACE_PX:
+        score, main = score_one(detect, ref, path)
+        if score.verdict in ("same", "different"):
             judgeable.append(main.embedding)
-        scores.append(FaceScore(
-            image=path.name,
-            faces=len(faces),
-            similarity=None if main is None else round(cosine(ref.embedding, main.embedding), 3),
-            height_px=None if main is None else main.height_px,
-            det_score=None if main is None else round(main.det_score, 3),
-        ))
+        scores.append(score)
     pairs = [round(cosine(a, b), 3) for a, b in combinations(judgeable, 2)]
     return scores, pairs
