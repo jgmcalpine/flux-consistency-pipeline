@@ -131,3 +131,16 @@ def test_missing_reference_file_is_a_problem(bible_dir, tmp_path):
 def test_lock_rejects_random_files(bible_dir, tmp_path):
     with pytest.raises(ValueError):
         lock(load_bible(bible_dir), bible_dir, tiny_png(tmp_path / "holiday.png", 8, 8))
+
+
+def test_prop_reference_is_locked_and_attached_with_its_own_image_number(bible_dir, tmp_path):
+    bible = load_bible(bible_dir)
+    shot = next(s for s in bible.shots if s.props)
+    prop_id = shot.props[0]
+    cand = candidates(bible, "prop", prop_id, out_dir=tmp_path, n=1, model="flux-2-pro")[0]
+    assert "product photograph" in json.loads(cand.request.payload["prompt"])["composition"]
+    lock(bible, bible_dir, tiny_png(cand.out, 992, 992))
+    bible = load_bible(bible_dir)
+    assert bible.props[prop_id].reference_images == [f"refs/{prop_id}/prop.png"]
+    subjects = build_structured(bible, bible.shot(shot.id))["subjects"]
+    assert any(s["description"].startswith("exactly the object shown in image 1") for s in subjects)

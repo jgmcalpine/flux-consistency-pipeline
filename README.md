@@ -25,7 +25,7 @@ fluxpipe validate             # check the story bible
 fluxpipe prompts              # see the prompt every shot will use
 fluxpipe generate s01         # one still (logged only while DRY_RUN=true)
 fluxpipe credits              # BFL balance (free call, needs the key)
-fluxpipe refs face keeper     # candidate reference images (M3); then: fluxpipe lock <path>
+fluxpipe refs face ismael     # candidate reference images (M3); then: fluxpipe lock <path>
 fluxpipe budget               # estimated spend vs. the cap
 pytest
 ```
@@ -34,7 +34,7 @@ pytest
 
 | Path                         | What it is                                                |
 | ---------------------------- | --------------------------------------------------------- |
-| `bible/`                     | Stage 1: characters, locations and the shot list, as YAML |
+| `bible/`                     | Stage 1: characters, locations, props and the shot list, as YAML; locked references in `bible/refs/` |
 | `src/fluxpipe/bible.py`      | Loads and validates the bible                             |
 | `src/fluxpipe/prompts.py`    | Builds every prompt from one template                     |
 | `src/fluxpipe/ledger.py`     | SQLite log of every paid call; enforces `SPEND_CAP_USD`   |

@@ -1,0 +1,8 @@
+id: jungle_path
+name: Jungle path
+description: >-
+  a narrow, winding dirt path climbing through dense jungle to a grassy ridge, a small thatched
+  hut at the top, a slow mist rising from the canopy below
+lighting: golden hour turning to dusk, low warm sun raking through the trees, long soft shadows
+palette: ["#4F6B4A", "#D9A441", "#8A5A3B", "#2B2F33"]
+reference_images: []

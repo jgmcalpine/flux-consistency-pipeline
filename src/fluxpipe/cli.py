@@ -37,7 +37,7 @@ def validate() -> None:
         raise typer.Exit(1)
     typer.secho(
         f"Bible OK: {len(bible.characters)} character(s), {len(bible.locations)} location(s),"
-        f" {len(bible.shots)} shot(s).",
+        f" {len(bible.props)} prop(s), {len(bible.shots)} shot(s).",
         fg="green",
     )
 
@@ -124,8 +124,8 @@ def generate(
 
 @app.command()
 def refs(
-    kind: str = typer.Argument(..., help="face | sheet | plate"),
-    target: str = typer.Argument(..., help="A character id (face, sheet) or location id (plate)."),
+    kind: str = typer.Argument(..., help="face | sheet | plate | prop"),
+    target: str = typer.Argument(..., help="Character id (face, sheet), location id (plate) or prop id (prop)."),
     costume: str = typer.Option(None, help="For sheet: which costume."),
     n: int = typer.Option(4, help="How many candidates (different seeds) to make."),
     model: str = typer.Option("flux-2-pro"),

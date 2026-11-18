@@ -1,12 +1,11 @@
-# A sample character. Replace with your own in M1.
-#
 # identity = what must NEVER change between shots. Be specific and physical:
 # "deep-set grey eyes" survives 10 generations; "kind eyes" drifts on the 2nd.
+# Describe what a camera sees, not the story: "living in the jungle" would put jungle in every shot.
 # One unusual mark (a scar, a streak of colour) gives you and the QA step an anchor.
-id: keeper
+id: ismael
 name: Ismael Calder
 identity:
-  who: a man, a jewelry-maker
+  who: a man, a jewelry maker
   age: in his early 40s
   build: tall and wiry, slightly stooped shoulders
   face: weathered tan skin, deep-set brown-green eyes, high cheekbones, deep laugh lines, short dark beard flecked with grey, neatly trimmed
@@ -14,14 +13,12 @@ identity:
   marks: a thin pale scar through his left eyebrow
 
 # costumes = what CAN change, but only between scenes, never within one.
+# The story is one continuous afternoon, so there is one costume.
 # Hex codes pin colours exactly (FLUX.2 reads "in color #RRGGBB").
 costumes:
   beachwear: >-
     a tank top in color #1A6DBD with a circle of color #D2E312 on the front,
     a pair of shorts in color #9C8084, simple brown rope sandals
-  indoor: >-
-    a light blue short-sleeved shirt in color #A1D3F0 with a circle of color #D2E312 on the front,
-    a pair of mauve-grey pants in color #9C8084, black sandals
 
-# Filled in at M3 with the paths of the reference images you lock.
+# Locked at M3 with `fluxpipe lock`: the face, then one sheet per costume.
 reference_images: []

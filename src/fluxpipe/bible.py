@@ -47,6 +47,15 @@ class Location(Strict):
     reference_images: list[str] = Field(default_factory=list)
 
 
+class Prop(Strict):
+    """An object the story depends on. Like a character, it must look the same in every shot."""
+
+    id: str
+    name: str
+    description: str  # precise and physical: shape, size, material, colour (hex)
+    reference_images: list[str] = Field(default_factory=list)
+
+
 class Camera(Strict):
     angle: str | None = None
     lens: str | None = None
@@ -61,6 +70,7 @@ class Shot(Strict):
     framing: str
     action: str
     position: str = "centre frame"
+    props: list[str] = Field(default_factory=list)  # prop ids visible in this shot
     mood: str = ""
     camera: Camera = Field(default_factory=Camera)
     duration_s: float = 5
@@ -71,6 +81,7 @@ class Bible(Strict):
     camera_defaults: Camera
     characters: dict[str, Character]
     locations: dict[str, Location]
+    props: dict[str, Prop] = Field(default_factory=dict)
     shots: list[Shot]
     _dir: Path | None = PrivateAttr(default=None)
 
@@ -107,6 +118,9 @@ class Bible(Strict):
                 )
             if shot.location not in self.locations:
                 issues.append(f"{shot.id}: unknown location '{shot.location}'")
+            for prop in shot.props:
+                if prop not in self.props:
+                    issues.append(f"{shot.id}: unknown prop '{prop}'")
         for char in self.characters.values():
             for costume in char.costume_references:
                 if costume not in char.costumes:
@@ -122,8 +136,8 @@ class Bible(Strict):
             yield from ((char.id, r) for r in char.reference_images)
             for refs in char.costume_references.values():
                 yield from ((char.id, r) for r in refs)
-        for loc in self.locations.values():
-            yield from ((loc.id, r) for r in loc.reference_images)
+        for item in [*self.locations.values(), *self.props.values()]:
+            yield from ((item.id, r) for r in item.reference_images)
 
 
 def _load_dir(folder: Path, model: type[BaseModel]) -> dict:
@@ -141,6 +155,7 @@ def load_bible(bible_dir: Path) -> Bible:
         camera_defaults=Camera.model_validate(shots_file.get("camera_defaults") or {}),
         characters=_load_dir(bible_dir / "characters", Character),
         locations=_load_dir(bible_dir / "locations", Location),
+        props=_load_dir(bible_dir / "props", Prop),
         shots=[Shot.model_validate(s) for s in shots_file["shots"]],
     )
     bible._dir = bible_dir

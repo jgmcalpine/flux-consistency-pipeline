@@ -16,7 +16,6 @@ From M3 the locked reference images are attached too, and the prompt says which 
 from __future__ import annotations
 
 import json
-
 from dataclasses import dataclass
 
 from .bible import Bible, Shot
@@ -24,7 +23,7 @@ from .bible import Bible, Shot
 
 @dataclass(frozen=True)
 class Ref:
-    role: str  # face | costume | location
+    role: str  # face | costume | prop:<id> | location
     path: str  # relative to the bible folder
 
 
@@ -35,6 +34,7 @@ def shot_refs(bible: Bible, shot: Shot) -> list[Ref]:
     return [
         *(Ref("face", r) for r in char.reference_images),
         *(Ref("costume", r) for r in char.costume_references.get(shot.costume, [])),
+        *(Ref(f"prop:{p}", r) for p in shot.props for r in bible.props[p].reference_images),
         *(Ref("location", r) for r in loc.reference_images),
     ]
 
@@ -54,15 +54,15 @@ def build_structured(bible: Bible, shot: Shot) -> dict:
         description = f"the same person as in {who}: {description}"
     if outfit:
         description += f", exactly the outfit shown in {outfit}"
+    subjects = [{"description": description, "position": shot.position, "action": shot.action}]
+    for prop_id in shot.props:
+        # Each prop is its own subject, described word for word from the bible, like the character.
+        seen_in = _images(refs, f"prop:{prop_id}")
+        text = bible.props[prop_id].description
+        subjects.append({"description": f"exactly the object shown in {seen_in}: {text}" if seen_in else text})
     prompt = {
         "scene": f"the location from {place}: {loc.description}" if place else loc.description,
-        "subjects": [
-            {
-                "description": description,
-                "position": shot.position,
-                "action": shot.action,
-            }
-        ],
+        "subjects": subjects,
         "style": bible.style,
         "color_palette": loc.palette,
         "lighting": loc.lighting,
@@ -89,6 +89,7 @@ def as_text(prompt: dict) -> str:
     parts = [
         f"{_cap(prompt['composition'])} of {subj['description']}.",
         f"{_cap(subj['action'])}, {subj['position']}.",
+        *(f"{_cap(p['description'])}." for p in prompt["subjects"][1:]),
         f"Setting: {prompt['scene']}.",
         f"Lighting: {prompt['lighting']}.",
     ]

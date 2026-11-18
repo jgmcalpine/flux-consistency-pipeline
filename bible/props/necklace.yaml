@@ -1,0 +1,8 @@
+# Described without its state: whether the setting is empty or holds the crystal is
+# said in each shot's action. When locking its reference, pick a candidate with an EMPTY setting.
+id: necklace
+name: Copper necklace
+description: >-
+  a handmade pendant of braided copper wire in color #B87333 with a four-claw setting
+  at its centre, hung on a dark brown leather cord
+reference_images: []

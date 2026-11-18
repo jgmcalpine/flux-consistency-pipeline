@@ -5,6 +5,7 @@ Three kinds, made in this order:
   sheet  the character in one costume, four views side by side. Attaches the LOCKED face,
          so every costume sheet shows the same person.
   plate  a location with no people in it, in its own lighting.
+  prop   one story object alone on a plain background, so its shape and colour are fixed.
 
 Candidates go to assets/refs/<id>/ (git-ignored). `fluxpipe lock` copies the one you
 choose into bible/refs/<id>/ (committed) and records it in the bible YAML. From then on
@@ -29,8 +30,8 @@ STUDIO = {
     "style": "realistic photograph, sharp focus, natural skin texture, true-to-life colour",
     "lighting": "soft, even studio light from the front, no harsh shadows",
 }
-SIZES = {"face": (896, 1088), "sheet": (1920, 1088), "plate": (1280, 720)}
-CANDIDATE = re.compile(r"^(?P<kind>face|sheet|plate)(?:-(?P<costume>[\w-]+))?_s\d+\.png$")
+SIZES = {"face": (896, 1088), "sheet": (1920, 1088), "plate": (1280, 720), "prop": (992, 992)}
+CANDIDATE = re.compile(r"^(?P<kind>face|sheet|plate|prop)(?:-(?P<costume>[\w-]+))?_s\d+\.png$")
 
 
 @dataclass
@@ -92,6 +93,17 @@ def _plate_prompt(bible: Bible, loc_id: str) -> dict:
     }
 
 
+def _prop_prompt(bible: Bible, prop_id: str) -> dict:
+    prop = bible.props[prop_id]
+    return {
+        **STUDIO,
+        "subjects": [{"description": prop.description, "position": "centre frame"}],
+        "lighting": "soft, even studio light, a gentle shadow beneath the object",
+        "composition": "product photograph of a single object, filling the middle of the frame, nothing else",
+        "camera": {"angle": "slightly above", "lens": "100mm macro", "depth_of_field": "the whole object sharp"},
+    }
+
+
 def candidates(
     bible: Bible, kind: str, target: str, *, out_dir: Path, n: int, model: str,
     costume: str | None = None,
@@ -112,8 +124,12 @@ def candidates(
         if target not in bible.locations:
             raise ValueError(f"No location '{target}'. Locations: {', '.join(bible.locations)}")
         prompt = _plate_prompt(bible, target)
+    elif kind == "prop":
+        if target not in bible.props:
+            raise ValueError(f"No prop '{target}'. Props: {', '.join(bible.props) or '(none)'}")
+        prompt = _prop_prompt(bible, target)
     else:
-        raise ValueError("kind must be face, sheet or plate")
+        raise ValueError("kind must be face, sheet, plate or prop")
 
     width, height = SIZES[kind]
     label = f"{kind}-{costume}" if costume else kind
@@ -147,8 +163,9 @@ def lock(bible: Bible, bible_dir: Path, candidate: Path) -> tuple[str, list[str]
     shutil.copyfile(candidate, dest)
 
     warnings: list[str] = []
-    if kind == "plate":
-        _edit_yaml(bible_dir / "locations", target, lambda d: d.__setitem__("reference_images", [rel]))
+    if kind in ("plate", "prop"):
+        folder = bible_dir / ("locations" if kind == "plate" else "props")
+        _edit_yaml(folder, target, lambda d: d.__setitem__("reference_images", [rel]))
     elif kind == "face":
         char = bible.characters[target]
         if char.costume_references:
