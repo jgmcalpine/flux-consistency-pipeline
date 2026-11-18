@@ -17,7 +17,7 @@ identity:
 # Hex codes pin colours exactly (FLUX.2 reads "in color #RRGGBB").
 costumes:
   beachwear: >-
-    a tank top in color #1A6DBD with a circle of color #D2E312 on the front,
+    a tank top in color #40474D with a circle of color #DCB54A on the front,
     a pair of shorts in color #9C8084, simple brown rope sandals
 
 # Locked at M3 with `fluxpipe lock`: the face, then one sheet per costume.
