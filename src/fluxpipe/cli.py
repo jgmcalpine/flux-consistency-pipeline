@@ -1,4 +1,4 @@
-"""Command line: fluxpipe validate | prompts | diff | generate | baseline | keyframes | edit | pick | video | score-clip | demo | score | refs | lock | credits | budget"""
+"""Command line: fluxpipe validate | prompts | diff | generate | baseline | keyframes | edit | pick | video | score-clip | demo | cut | score | refs | lock | credits | budget"""
 
 from __future__ import annotations
 
@@ -512,6 +512,56 @@ def demo(
         typer.echo(f"Headline over {', '.join(h['shots'])}: {h['baseline']:.3f} -> {h['pipeline']:.3f}")
     typer.secho(f"  wrote {out.relative_to(root) if out.is_relative_to(root) else out}"
                 f"  (parts in {(settings.assets_dir / 'demo').relative_to(root)}/)", fg="green")
+
+
+@app.command()
+def cut(
+    use: list[str] = typer.Option([], help="Use this take for a shot, e.g. --use s07=s07_draft3.mp4 (repeat)."),
+    title: str = typer.Option("The Green Crystal", help="Title card text."),
+    out: Path = typer.Option(None, help="Output mp4 (default results/film.mp4)."),
+) -> None:
+    """M7: the rough cut, every shot in story order from clips of the current picks. Free (ffmpeg)."""
+    from .cut import build as build_cut
+    from .cut import choose_clips
+
+    settings = load_settings()
+    bible = load_bible(settings.bible_dir)
+    root = settings.assets_dir.parent
+    results = root / "results"
+    picks = json.loads((results / "keyframes" / "picks.json").read_text())
+    clips_file = results / "video" / "clips.json"
+    clips = json.loads(clips_file.read_text()) if clips_file.is_file() else {}
+    overrides = {}
+    for u in use:
+        if "=" not in u:
+            typer.secho(f"  x --use takes SHOT=FILE, got {u!r}", fg="red")
+            raise typer.Exit(2)
+        sid, name = u.split("=", 1)
+        overrides[sid] = name
+    shots, problems = choose_clips([(s.id, s.location) for s in bible.shots], picks, clips,
+                                   results / "video", settings.assets_dir / "video", overrides)
+    if problems:
+        for p in problems:
+            typer.secho(f"  x {p}", fg="red")
+        raise typer.Exit(2)
+
+    finals = sum(s.kind == "final" for s in shots)
+    spend = Ledger(settings.ledger_path, settings.spend_cap_usd).total_spent()
+    quality = (f"{finals} finished, {len(shots) - finals} at draft quality" if finals < len(shots)
+               else "all finished")
+    end_lines = [
+        "Every frame made with FLUX",
+        "stills: FLUX.2 [pro] from a story bible and locked references",
+        "motion: FLUX 3 video, image-to-video from each still",
+        f"{len(shots)} shots, {quality}  ·  total API spend ${spend:.2f}",
+    ]
+    out = out or results / "film.mp4"
+    for s in shots:
+        typer.echo(f"  {s.id}  {s.kind:<5}  {s.clip.relative_to(root)}")
+    info = build_cut(shots, out, settings.assets_dir / "cut", title=title,
+                     subtitle="a rough cut" if finals < len(shots) else "", end_lines=end_lines)
+    typer.secho(f"  wrote {out.relative_to(root) if out.is_relative_to(root) else out}"
+                f"  ({info['story_s']:.1f} s of story; parts in assets/cut/)", fg="green")
 
 
 @app.command("score-clip")

@@ -137,8 +137,8 @@ shots:
       in the fire pit beside him
     mood: eager
     motion: >-
-      sitting at the worktable, he leans forward and sorts through the copper wire with both hands,
-      the fire flickering beside him; the camera holds still
+      sitting by the fire, he turns to the worktable at his side and sorts through the copper wire
+      with both hands, the fire flickering beside him; the camera holds still
     duration_s: 5
 
   - id: s08
@@ -173,8 +173,8 @@ shots:
     lighting: warm amber firelight from the fire burning just out of frame
     face: false
     motion: >-
-      his hands lift the cloth away and lay it aside, leaving the necklace on the table with its
-      copper cage empty; firelight flickers across the table; the camera holds still
+      his hands draw the small green cloth up off the necklace's cord and lay it aside on the table;
+      the empty copper cage settles on the table; firelight flickers across it; the camera holds still
     duration_s: 5
 
   - id: s10
