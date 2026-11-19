@@ -83,10 +83,10 @@ def test_start_frame_is_cropped_to_hd(tmp_path):
 def test_video_job_keeps_poll_and_leaves_blobs_out_of_the_ledger(tmp_path):
     def handler(request: httpx.Request) -> httpx.Response:
         if request.method == "POST":
-            return httpx.Response(200, json={"id": "v1", "cost": 30,
+            return httpx.Response(200, json={"id": "v1",  # video: no cost at submit...
                                              "polling_url": "https://api.bfl.ai/v1/get_result?id=v1"})
-        if "get_result" in request.url.path:
-            return httpx.Response(200, json={"status": "Ready", "result": {
+        if "get_result" in request.url.path:  # ...it comes with the result (seen 19 Nov)
+            return httpx.Response(200, json={"status": "Ready", "cost": 30.0, "result": {
                 "sample": "https://delivery.bfl.ai/v.mp4", "draft_cache": "https://delivery.bfl.ai/c.bin"}})
         return httpx.Response(200, content=b"bytes")
 

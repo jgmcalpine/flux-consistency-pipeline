@@ -117,6 +117,8 @@ class BFLClient:
             if job.get("cost") is not None:
                 cost = round(float(job["cost"]) * USD_PER_CREDIT, 4)
             poll = self._poll(job["polling_url"], poll_timeout_s)
+            if cost is None and poll.get("cost") is not None:  # FLUX 3 video reports it here
+                cost = round(float(poll["cost"]) * USD_PER_CREDIT, 4)
             image = self.download.get(poll["result"]["sample"])
             image.raise_for_status()
             out_path.parent.mkdir(parents=True, exist_ok=True)
