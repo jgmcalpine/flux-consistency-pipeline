@@ -7,14 +7,20 @@
         "cost_usd": 0.3,
         "draft_cache": "s02_draft1.cache.bin",
         "from_pick": "s02_flux-2-pro_s3194447976.png"
+      },
+      {
+        "file": "s02_draft2.mp4",
+        "from_pick": "s02_flux-2-pro_s3194447978.png",
+        "cost_usd": 0.3,
+        "draft_cache": "s02_draft2.cache.bin"
       }
     ],
     "final": {
-      "from": "s02_draft1.mp4",
+      "from": "s02_draft2.mp4",
+      "from_pick": "s02_flux-2-pro_s3194447978.png",
       "resolution": "hd",
       "file": "s02_final_hd.mp4",
-      "cost_usd": 0.75,
-      "from_pick": "s02_flux-2-pro_s3194447976.png"
+      "cost_usd": 0.75
     }
   },
   "s04": {
@@ -25,9 +31,21 @@
         "cost_usd": 0.3,
         "draft_cache": "s04_draft1.cache.bin",
         "from_pick": "s04_flux-2-pro_s1459932510.png"
+      },
+      {
+        "file": "s04_draft2.mp4",
+        "from_pick": "s04_flux-2-pro_s1459932511.png",
+        "cost_usd": 0.3,
+        "draft_cache": "s04_draft2.cache.bin"
       }
     ],
-    "final": null
+    "final": {
+      "from": "s04_draft2.mp4",
+      "from_pick": "s04_flux-2-pro_s1459932511.png",
+      "resolution": "hd",
+      "file": "s04_final_hd.mp4",
+      "cost_usd": 0.75
+    }
   },
   "s07": {
     "keyframe": "s07.png",

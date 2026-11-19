@@ -1,4 +1,4 @@
-"""Command line: fluxpipe validate | prompts | diff | generate | baseline | keyframes | edit | pick | video | score-clip | score | refs | lock | credits | budget"""
+"""Command line: fluxpipe validate | prompts | diff | generate | baseline | keyframes | edit | pick | video | score-clip | demo | score | refs | lock | credits | budget"""
 
 from __future__ import annotations
 
@@ -450,6 +450,68 @@ def video(
                     fg="green")
     if not settings.dry_run:
         typer.echo(f"Watch them, then: fluxpipe score-clip <file>  and  fluxpipe video {shot} --enhance <file>")
+
+
+DEMO_SHOTS = ["s02", "s04", "s08"]  # the face shots with an enhanced clip (s07's face is too small)
+
+
+@app.command()
+def demo(
+    shot: list[str] = typer.Option(DEMO_SHOTS, help="Shots to show, in order (repeat the option)."),
+    character: str = typer.Option("ismael", help="Whose locked face the scores compare against."),
+    out: Path = typer.Option(None, help="Output mp4 (default results/demo.mp4)."),
+) -> None:
+    """M7-lite: side-by-side of plain prompts vs the pipeline, with face scores. Free (ffmpeg + Pillow)."""
+    from .demo import DemoShot, build, load_scores
+
+    settings = load_settings()
+    bible = load_bible(settings.bible_dir)
+    root = settings.assets_dir.parent
+    results = root / "results"
+    char = bible.characters.get(character)
+    if char is None or not char.reference_images:
+        typer.secho(f"  x no locked face for '{character}'", fg="red")
+        raise typer.Exit(2)
+    base_scores = load_scores(results / "baseline" / "faces.json")
+    pipe_scores = load_scores(results / "keyframes" / "faces.json")
+    picks = json.loads((results / "keyframes" / "picks.json").read_text())
+    clips_file = results / "video" / "clips.json"
+    clips = json.loads(clips_file.read_text()) if clips_file.is_file() else {}
+
+    shots, problems = [], []
+    for sid in shot:
+        stills = sorted((results / "baseline").glob(f"{sid}_*.png"))
+        clip = results / "video" / f"{sid}.mp4"
+        if not stills:
+            problems.append(f"{sid}: no baseline still in results/baseline/")
+        if not clip.is_file():
+            problems.append(f"{sid}: no enhanced clip (fluxpipe video {sid} --enhance <draft>)")
+        final = clips.get(sid, {}).get("final") or {}
+        pick = picks.get(sid, {}).get("pick")
+        if clip.is_file() and final.get("from_pick") != pick:
+            problems.append(f"{sid}: the clip was animated from {final.get('from_pick')}, but the pick is {pick}")
+        if sid not in base_scores or sid not in pipe_scores:
+            problems.append(f"{sid}: no face score (fluxpipe score results/baseline|keyframes)")
+        if not problems:
+            shots.append(DemoShot(sid, stills[0], clip, base_scores[sid], pipe_scores[sid]))
+    if problems:
+        for p in problems:
+            typer.secho(f"  x {p}", fg="red")
+        raise typer.Exit(2)
+
+    out = out or results / "demo.mp4"
+    spend = Ledger(settings.ledger_path, settings.spend_cap_usd).total_spent()
+    typer.echo(f"Building {len(shots)} shots: {', '.join(s.id for s in shots)}...")
+    info = build(shots, bible.ref_path(char.reference_images[0]), out, settings.assets_dir / "demo",
+                 spend_usd=spend)
+    for s in shots:
+        b, p = s.base.label(), s.pipe.label()
+        typer.echo(f"  {s.id}: plain {b[0]} ({b[1]})  vs  pipeline {p[0]} ({p[1]})")
+    if info["headline"]:
+        h = info["headline"]
+        typer.echo(f"Headline over {', '.join(h['shots'])}: {h['baseline']:.3f} -> {h['pipeline']:.3f}")
+    typer.secho(f"  wrote {out.relative_to(root) if out.is_relative_to(root) else out}"
+                f"  (parts in {(settings.assets_dir / 'demo').relative_to(root)}/)", fg="green")
 
 
 @app.command("score-clip")
