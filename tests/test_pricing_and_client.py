@@ -175,7 +175,7 @@ def test_edit_request_sends_the_frame_then_its_extra_images(bible):
     extra = [bible.ref_path(r) for r in shot.edit_refs]
     req = edit_request(shot, frame, seed=7, extra=extra)
     p = req.payload
-    assert p["prompt"].startswith("Replace the small green crystal") and p["prompt"].endswith(EDIT_KEEP)
+    assert p["prompt"].startswith("Replace the pendant on his chest") and p["prompt"].endswith(EDIT_KEEP)
     assert "image 2" in p["prompt"]
     assert req.refs == [str(frame), *map(str, extra)]  # the frame is always image 1
     assert "input_image_2" in p and "input_image_3" not in p

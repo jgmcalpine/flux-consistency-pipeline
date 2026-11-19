@@ -1,6 +1,7 @@
 # The shot list. Every shot references the bible by id; prompts are built from it.
 # Story: Ismael finds a green crystal in a jungle river, carries it home at dusk,
-# sets it into the necklace he has been making, and falls asleep in his hammock as the fire dies.
+# sets it into the necklace he has been making, and falls asleep in his hammock wearing it as the
+# fire dies.
 #
 # Walk home: s05 he climbs the path AWAY from camera toward his hut on the ridge (the plate's
 # view); s06 he reaches it moving LEFT TO RIGHT. His hut is the only building in the film.
@@ -167,28 +168,28 @@ shots:
     character: ismael
     costume: beachwear
     location: thatched_hut
-    # The crystal is NOT its own subject here: a separate subject gets drawn as a separate object
-    # (round 2 stood it loose on the table). It is part of the finished necklace, so the action says so.
-    props: [necklace]
+    # No props: the necklace's product-shot reference was pasted in at product size (round 3), and
+    # on a table nothing tells the model how big a pendant is. On his chest his body sets the scale,
+    # as his hands did for the crystal in s08/s10. The keyframe draws a small pendant from words; the
+    # edit then swaps in the real one.
     framing: medium wide shot, the hammock and the worktable both in frame
     position: lying stretched out in the hammock on the left, the worktable on the right
     action: >-
-      he lies asleep in the hammock, eyes closed; the finished necklace lies flat on the worktable,
-      the small green crystal now held inside its copper cage; the fire pit has burnt out
+      he lies asleep in the hammock, eyes closed, wearing the finished necklace: a small copper
+      wire pendant on a brown leather cord around his neck, resting on his chest
     mood: peaceful, complete
     lighting: >-
       cold blue moonlight only; the fire pit is dark, burnt out to grey ash with a thin wisp of smoke
-    # Two things words couldn't do here, fixed by editing the picked frame (`fluxpipe edit s11`):
-    #  - the plate shows a burning fire and wins over the lighting text (rounds 2 and 3);
-    #  - "crystal inside the necklace" had no reference, so the necklace came out at product-shot
-    #    size or the crystal lay loose (round 3). Now s10's pick shows the finished pendant: its crop
-    #    (bible/refs/necklace/finished.png, ffmpeg from results/keyframes/s10.png) is image 2.
-    # The size is anchored to the loose crystal already on the table in the frame being edited.
+    # Fixed by editing the picked frame (`fluxpipe edit s11`), because words couldn't:
+    #  - the plate shows a burning fire and wins over the lighting text (rounds 2-4);
+    #  - the pendant must be the finished one from s10 (crystal in the cage), which no locked
+    #    reference shows. image 2 is its crop from s10's pick (bible/refs/necklace/finished.png).
+    # Its size is anchored to the pendant already on his chest in the frame being edited.
     edit: >-
-      Replace the small green crystal standing on the worktable with the finished pendant held up in
-      image 2, lying flat on its own on the table in the same spot, the same small size as the
-      crystal it replaces, its brown leather cord coiled beside it. The fire in the fire pit has burnt
-      out: the fire pit holds only cold grey ash and a thin wisp of smoke. The hut is lit only by cold
-      blue moonlight, the warm firelight gone from the man, the hammock and the worktable.
+      Replace the pendant on his chest with the finished pendant held up in image 2, the same small
+      size as the pendant it replaces, hanging on its brown leather cord around his neck. The fire
+      in the fire pit has burnt out: the fire pit holds only cold grey ash and a thin wisp of smoke.
+      The hut is lit only by cold blue moonlight, the warm firelight gone from the man, the hammock
+      and the worktable.
     edit_refs: [refs/necklace/finished.png]
     duration_s: 5
