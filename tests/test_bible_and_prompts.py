@@ -113,3 +113,18 @@ def test_hut_is_described_the_same_inside_and_out(bible):
 def test_missing_edit_ref_is_caught(bible):
     bible.shot("s11").edit_refs.append("refs/nope/missing.png")
     assert "s11: reference image not found: refs/nope/missing.png" in bible.problems()
+
+
+def test_a_shot_can_swap_a_props_reference_for_an_in_hand_crop(bible):
+    from fluxpipe.prompts import shot_refs
+    s04, s08 = bible.shot("s04"), bible.shot("s08")
+    assert [r.path for r in shot_refs(bible, s04) if r.role == "prop:crystal"] == ["refs/crystal/in_hand.png"]
+    assert [r.path for r in shot_refs(bible, s08) if r.role == "prop:crystal"] == ["refs/crystal/prop.png"]
+    crystal = next(x["description"] for x in build_structured(bible, s04)["subjects"][1:]
+                   if bible.props["crystal"].description in x["description"])
+    assert "same size compared with the hand" in crystal
+
+
+def test_prop_refs_must_name_a_prop_of_the_shot(bible):
+    bible.shot("s08").prop_refs = {"satchel": ["refs/satchel/prop.png"]}
+    assert any("prop_refs names 'satchel'" in p for p in bible.problems())

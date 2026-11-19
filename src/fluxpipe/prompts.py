@@ -35,7 +35,8 @@ def shot_refs(bible: Bible, shot: Shot) -> list[Ref]:
         # A face reference is a portrait and pulls its framing in: hands-only shots go without it.
         *(Ref("face", r) for r in (char.reference_images if shot.face else [])),
         *(Ref("costume", r) for r in char.costume_references.get(shot.costume, [])),
-        *(Ref(f"prop:{p}", r) for p in shot.props for r in bible.props[p].reference_images),
+        *(Ref(f"prop:{p}", r) for p in shot.props
+          for r in shot.prop_refs.get(p, bible.props[p].reference_images)),
         *(Ref("location", r) for r in (loc.reference_images if shot.plate else [])),
     ]
 
@@ -60,7 +61,11 @@ def build_structured(bible: Bible, shot: Shot) -> dict:
         # Each prop is its own subject, described word for word from the bible, like the character.
         seen_in = _images(refs, f"prop:{prop_id}")
         text = bible.props[prop_id].description
-        subjects.append({"description": f"exactly the object shown in {seen_in}: {text}" if seen_in else text})
+        if seen_in and prop_id in shot.prop_refs:  # an in-hand crop: it carries the size too
+            text = f"exactly the object shown in {seen_in}, at the same size compared with the hand as there: {text}"
+        elif seen_in:
+            text = f"exactly the object shown in {seen_in}: {text}"
+        subjects.append({"description": text})
     prompt = {
         "scene": f"the location from {place}: {shot.scene or loc.description}" if place
         else shot.scene or loc.description,

@@ -3,7 +3,7 @@
     "shot": "s01",
     "fingerprint": "bcd6cf87a4df17a4",
     "status": "by eye",
-    "pick": "s01_flux-2-pro_s661535186.png",
+    "pick": "s01_flux-2-pro_s661535187.png",
     "candidates": [
       {
         "image": "s01_flux-2-pro_s661535186.png",
@@ -32,13 +32,15 @@
         "verdict": "too small",
         "seed": 661535188
       }
-    ]
+    ],
+    "picked_by": "eye",
+    "note": "owner's choice, 20 Nov"
   },
   "s02": {
     "shot": "s02",
     "fingerprint": "283dacc27bc193a7",
     "status": "pass",
-    "pick": "s02_flux-2-pro_s3194447976.png",
+    "pick": "s02_flux-2-pro_s3194447978.png",
     "candidates": [
       {
         "image": "s02_flux-2-pro_s3194447976.png",
@@ -67,7 +69,9 @@
         "verdict": "same",
         "seed": 3194447978
       }
-    ]
+    ],
+    "picked_by": "eye",
+    "note": "owner's choice, 20 Nov"
   },
   "s03": {
     "shot": "s03",
@@ -106,34 +110,40 @@
   },
   "s04": {
     "shot": "s04",
-    "fingerprint": "8a7d0ca032ad77ca",
+    "fingerprint": "ade542944d8ef7c9",
     "status": "pass",
-    "pick": "s04_flux-2-pro_s1459932510.png",
+    "pick": "s04_flux-2-pro_s1459932511.png",
     "candidates": [
       {
         "image": "s04_flux-2-pro_s1459932509.png",
         "faces": 1,
-        "similarity": 0.689,
-        "height_px": 145,
-        "det_score": 0.864,
-        "verdict": "same",
+        "similarity": 0.71,
+        "height_px": 147,
+        "det_score": 0.836,
+        "pitch": -19.3,
+        "yaw": 64.6,
+        "verdict": "turned away",
         "seed": 1459932509
       },
       {
         "image": "s04_flux-2-pro_s1459932510.png",
         "faces": 1,
-        "similarity": 0.732,
-        "height_px": 150,
-        "det_score": 0.895,
+        "similarity": 0.632,
+        "height_px": 140,
+        "det_score": 0.857,
+        "pitch": -29.9,
+        "yaw": 57.2,
         "verdict": "same",
         "seed": 1459932510
       },
       {
         "image": "s04_flux-2-pro_s1459932511.png",
         "faces": 1,
-        "similarity": 0.692,
-        "height_px": 157,
-        "det_score": 0.883,
+        "similarity": 0.683,
+        "height_px": 129,
+        "det_score": 0.838,
+        "pitch": -22.0,
+        "yaw": 57.3,
         "verdict": "same",
         "seed": 1459932511
       }
@@ -143,7 +153,7 @@
     "shot": "s05",
     "fingerprint": "c205bb3836a1376f",
     "status": "by eye",
-    "pick": "s05_flux-2-pro_s537132491.png",
+    "pick": "s05_flux-2-pro_s537132492.png",
     "candidates": [
       {
         "image": "s05_flux-2-pro_s537132491.png",
@@ -172,7 +182,9 @@
         "verdict": "no face",
         "seed": 537132493
       }
-    ]
+    ],
+    "picked_by": "eye",
+    "note": "owner's choice, 20 Nov"
   },
   "s06": {
     "shot": "s06",
@@ -213,7 +225,7 @@
     "shot": "s07",
     "fingerprint": "42b913cf152b8aaf",
     "status": "pass",
-    "pick": "s07_flux-2-pro_s3456998633.png",
+    "pick": "s07_flux-2-pro_s3456998631.png",
     "candidates": [
       {
         "image": "s07_flux-2-pro_s3456998631.png",
@@ -242,7 +254,9 @@
         "verdict": "same",
         "seed": 3456998633
       }
-    ]
+    ],
+    "picked_by": "eye",
+    "note": "owner's choice, 20 Nov"
   },
   "s08": {
     "shot": "s08",
@@ -283,7 +297,7 @@
     "shot": "s09",
     "fingerprint": "f640240004881536",
     "status": "by eye",
-    "pick": "s09_flux-2-pro_s699773409.png",
+    "pick": "s09_flux-2-pro_s699773410.png",
     "candidates": [
       {
         "image": "s09_flux-2-pro_s699773408.png",
@@ -314,13 +328,13 @@
       }
     ],
     "picked_by": "eye",
-    "note": "clearest reveal: hands lift the cloth, empty cage in the centre"
+    "note": "owner's choice, 20 Nov"
   },
   "s10": {
     "shot": "s10",
     "fingerprint": "acf4048e5bc65c9e",
     "status": "by eye",
-    "pick": "s10_flux-2-pro_s1232222213.png",
+    "pick": "s10_flux-2-pro_s1232222215.png",
     "candidates": [
       {
         "image": "s10_flux-2-pro_s1232222213.png",
@@ -349,7 +363,9 @@
         "verdict": "no face",
         "seed": 1232222215
       }
-    ]
+    ],
+    "picked_by": "eye",
+    "note": "owner's choice, 20 Nov"
   },
   "s11": {
     "shot": "s11",

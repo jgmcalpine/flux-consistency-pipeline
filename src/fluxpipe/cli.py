@@ -380,6 +380,9 @@ def video(
     client = BFLClient(settings.api_key, Ledger(settings.ledger_path, settings.spend_cap_usd),
                        dry_run=settings.dry_run)
     entry = manifest.setdefault(shot, {"keyframe": keyframe.name, "takes": [], "final": None})
+    picks_file = root / "results" / "keyframes" / "picks.json"
+    # Which candidate the clip starts from: picks can change later, which makes a clip out of date.
+    pick = json.loads(picks_file.read_text()).get(shot, {}).get("pick") if picks_file.is_file() else None
 
     if enhance:
         name = Path(enhance).name
@@ -402,8 +405,9 @@ def video(
             return
         clips_dir.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(out, clips_dir / f"{shot}.mp4")
-        entry["final"] = {"from": name, "resolution": resolution, "file": out.name,
-                          "cost_usd": res.actual_cost_usd}
+        take = next((t for t in entry["takes"] if t["file"] == name), {})
+        entry["final"] = {"from": name, "from_pick": take.get("from_pick"), "resolution": resolution,
+                          "file": out.name, "cost_usd": res.actual_cost_usd}
         manifest_file.write_text(json.dumps(dict(sorted(manifest.items())), indent=2) + "\n")
         typer.secho(f"  saved {out.relative_to(root)} -> results/video/{shot}.mp4", fg="green")
         typer.echo(f"  cost: estimated ${req.est_cost_usd:.2f}, BFL reported "
@@ -437,7 +441,7 @@ def video(
         else:
             typer.secho(f"  ! no draft_cache in the response (see {out.with_suffix('.json').name});"
                         " this take can't be enhanced", fg="yellow")
-        entry["takes"].append({"file": out.name, "cost_usd": res.actual_cost_usd,
+        entry["takes"].append({"file": out.name, "from_pick": pick, "cost_usd": res.actual_cost_usd,
                                "draft_cache": cache.name if cache else None})
         manifest_file.parent.mkdir(parents=True, exist_ok=True)
         manifest_file.write_text(json.dumps(dict(sorted(manifest.items())), indent=2) + "\n")

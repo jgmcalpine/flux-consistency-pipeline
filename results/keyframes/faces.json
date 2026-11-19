@@ -5,21 +5,21 @@
     {
       "image": "s01.png",
       "faces": 1,
-      "similarity": 0.565,
-      "height_px": 75,
-      "det_score": 0.712,
-      "pitch": -13.2,
-      "yaw": 71.8,
+      "similarity": 0.471,
+      "height_px": 66,
+      "det_score": 0.782,
+      "pitch": -14.8,
+      "yaw": 73.7,
       "verdict": "too small"
     },
     {
       "image": "s02.png",
       "faces": 1,
-      "similarity": 0.808,
-      "height_px": 171,
-      "det_score": 0.857,
-      "pitch": -15.9,
-      "yaw": -3.7,
+      "similarity": 0.657,
+      "height_px": 95,
+      "det_score": 0.812,
+      "pitch": -22.7,
+      "yaw": -14.7,
       "verdict": "same"
     },
     {
@@ -35,11 +35,11 @@
     {
       "image": "s04.png",
       "faces": 1,
-      "similarity": 0.732,
-      "height_px": 150,
-      "det_score": 0.895,
-      "pitch": -4.0,
-      "yaw": 55.7,
+      "similarity": 0.683,
+      "height_px": 129,
+      "det_score": 0.838,
+      "pitch": -22.0,
+      "yaw": 57.3,
       "verdict": "same"
     },
     {
@@ -65,12 +65,12 @@
     {
       "image": "s07.png",
       "faces": 1,
-      "similarity": 0.605,
-      "height_px": 85,
-      "det_score": 0.869,
-      "pitch": -22.8,
-      "yaw": 7.6,
-      "verdict": "same"
+      "similarity": 0.535,
+      "height_px": 69,
+      "det_score": 0.857,
+      "pitch": -11.9,
+      "yaw": -30.1,
+      "verdict": "too small"
     },
     {
       "image": "s08.png",
@@ -114,11 +114,8 @@
     }
   ],
   "pairwise": [
-    0.753,
-    0.674,
-    0.728,
-    0.512,
-    0.796,
-    0.542
+    0.572,
+    0.614,
+    0.674
   ]
 }

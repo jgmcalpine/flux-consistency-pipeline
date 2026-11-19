@@ -74,15 +74,17 @@ shots:
     character: ismael
     costume: beachwear
     location: riverbank
-    # No crystal ref here: its product shot (crystal filling the frame) made it fist-sized in a
-    # medium shot, twice, whatever the words said. Too small here to need its exact facets.
-    props: [satchel]
+    # The product-shot crystal ref made it fist-sized here, twice; with no ref and "thumbnail" it came
+    # out tiny and lost its shape. So: the crystal cropped from s03 next to his fingertip, which
+    # carries the shape and the size (bible/refs/crystal/in_hand.png).
+    props: [crystal, satchel]
+    prop_refs: { crystal: [refs/crystal/in_hand.png] }
     framing: medium shot from the waist up, his hands and the satchel in frame
     camera: { lens: 85mm }
     position: centre frame, three-quarter view facing right
     action: >-
-      he smiles down at a tiny green crystal, no bigger than his thumbnail, pinched between the tips
-      of his thumb and forefinger just above the open satchel at his hip
+      he smiles down at the small crystal held between the tips of his thumb and forefinger, just
+      above the open satchel at his hip
     mood: quiet joy
     motion: >-
       he smiles down at the crystal in his hand, then slips it into the satchel at his hip and pats

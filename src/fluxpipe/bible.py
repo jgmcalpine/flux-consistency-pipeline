@@ -86,6 +86,10 @@ class Shot(Strict):
     edit: str | None = None
     # Extra images for the edit, attached after the frame (image 2, 3...). Paths relative to the bible.
     edit_refs: list[str] = Field(default_factory=list)
+    # Swap a prop's reference for this shot only, e.g. {crystal: [refs/crystal/in_hand.png]}: a crop
+    # that shows the prop next to his fingers, so the image carries its size as well as its look.
+    # A product-shot reference has no scale and gets pasted in at whatever size it fills its frame.
+    prop_refs: dict[str, list[str]] = Field(default_factory=dict)
     # M6, image-to-video: only what MOVES from the picked keyframe on, and what the camera does.
     # The start frame already sets the look; re-describing it invites the model to redraw it.
     motion: str | None = None
@@ -150,6 +154,9 @@ class Bible(Strict):
             for prop in shot.props:
                 if prop not in self.props:
                     issues.append(f"{shot.id}: unknown prop '{prop}'")
+            for prop in shot.prop_refs:
+                if prop not in shot.props:
+                    issues.append(f"{shot.id}: prop_refs names '{prop}', which isn't in its props")
         if self.baseline is not None:
             ids = {s.id for s in self.shots}
             for missing in sorted(ids - self.baseline.shots.keys()):
@@ -175,6 +182,8 @@ class Bible(Strict):
             yield from ((item.id, r) for r in item.reference_images)
         for shot in self.shots:
             yield from ((shot.id, r) for r in shot.edit_refs)
+            for refs in shot.prop_refs.values():
+                yield from ((shot.id, r) for r in refs)
 
 
 def _load_dir(folder: Path, model: type[BaseModel]) -> dict:

@@ -47,6 +47,7 @@ def bible_dir(tmp_path):
     shots = yaml.load((d / "shots.yaml").read_text())
     for shot in shots["shots"]:
         shot.pop("edit_refs", None)  # these point into refs/ too
+        shot.pop("prop_refs", None)
     with (d / "shots.yaml").open("w") as out:
         yaml.dump(shots, out)
     return d
