@@ -293,7 +293,8 @@ def edit(
     source = settings.assets_dir / "keyframes" / shot / base
     seeds = [(shot_seed(shot) + 1000 + i) % 2**32 for i in range(n)]
     try:
-        reqs = [edit_request(s, source, seed=seed) for seed in seeds]
+        extra = [bible.ref_path(r) for r in s.edit_refs]
+        reqs = [edit_request(s, source, seed=seed, extra=extra) for seed in seeds]
     except ValueError as exc:
         typer.secho(f"  x {exc}", fg="red")
         raise typer.Exit(2)

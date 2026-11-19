@@ -178,10 +178,17 @@ shots:
     mood: peaceful, complete
     lighting: >-
       cold blue moonlight only; the fire pit is dark, burnt out to grey ash with a thin wisp of smoke
-    # The plate shows a burning fire and wins over the lighting text (round 2), so the fire is put
-    # out afterwards by editing the picked frame: `fluxpipe edit s11`.
+    # Two things words couldn't do here, fixed by editing the picked frame (`fluxpipe edit s11`):
+    #  - the plate shows a burning fire and wins over the lighting text (rounds 2 and 3);
+    #  - "crystal inside the necklace" had no reference, so the necklace came out at product-shot
+    #    size or the crystal lay loose (round 3). Now s10's pick shows the finished pendant: its crop
+    #    (bible/refs/necklace/finished.png, ffmpeg from results/keyframes/s10.png) is image 2.
+    # The size is anchored to the loose crystal already on the table in the frame being edited.
     edit: >-
-      The fire in the fire pit has burnt out: the fire pit holds only cold grey ash and a thin wisp
-      of smoke. The hut is lit only by cold blue moonlight, the warm firelight gone from the man,
-      the hammock and the worktable.
+      Replace the small green crystal standing on the worktable with the finished pendant held up in
+      image 2, lying flat on its own on the table in the same spot, the same small size as the
+      crystal it replaces, its brown leather cord coiled beside it. The fire in the fire pit has burnt
+      out: the fire pit holds only cold grey ash and a thin wisp of smoke. The hut is lit only by cold
+      blue moonlight, the warm firelight gone from the man, the hammock and the worktable.
+    edit_refs: [refs/necklace/finished.png]
     duration_s: 5

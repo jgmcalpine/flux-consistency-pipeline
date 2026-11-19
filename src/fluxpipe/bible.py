@@ -84,6 +84,8 @@ class Shot(Strict):
     # A fix applied to the picked keyframe with FLUX.2 editing (`fluxpipe edit`), for what a reference
     # won't let the words change (s11: the plate's fire stays lit). Describe only the change.
     edit: str | None = None
+    # Extra images for the edit, attached after the frame (image 2, 3...). Paths relative to the bible.
+    edit_refs: list[str] = Field(default_factory=list)
 
 
 class Baseline(Strict):
@@ -168,6 +170,8 @@ class Bible(Strict):
                 yield from ((char.id, r) for r in refs)
         for item in [*self.locations.values(), *self.props.values()]:
             yield from ((item.id, r) for r in item.reference_images)
+        for shot in self.shots:
+            yield from ((shot.id, r) for r in shot.edit_refs)
 
 
 def _load_dir(folder: Path, model: type[BaseModel]) -> dict:

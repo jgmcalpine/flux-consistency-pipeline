@@ -353,35 +353,35 @@
   },
   "s11": {
     "shot": "s11",
-    "fingerprint": "2883304c3fcf43c5",
+    "fingerprint": "2fe34ec4217c7d78",
     "status": "by eye",
     "pick": "s11_flux-2-pro_s1047857299.png",
     "candidates": [
       {
         "image": "s11_flux-2-pro_s1047857299.png",
-        "faces": 1,
-        "similarity": 0.308,
-        "height_px": 48,
-        "det_score": 0.799,
-        "verdict": "too small",
-        "seed": 1047857299
-      },
-      {
-        "image": "s11_flux-2-pro_s1047857300.png",
-        "faces": 1,
-        "similarity": 0.239,
-        "height_px": 59,
-        "det_score": 0.706,
-        "verdict": "too small",
-        "seed": 1047857300
-      },
-      {
-        "image": "s11_flux-2-pro_s1047857301.png",
         "faces": 0,
         "similarity": null,
         "height_px": null,
         "det_score": null,
         "verdict": "no face",
+        "seed": 1047857299
+      },
+      {
+        "image": "s11_flux-2-pro_s1047857300.png",
+        "faces": 1,
+        "similarity": 0.38,
+        "height_px": 50,
+        "det_score": 0.64,
+        "verdict": "too small",
+        "seed": 1047857300
+      },
+      {
+        "image": "s11_flux-2-pro_s1047857301.png",
+        "faces": 1,
+        "similarity": 0.252,
+        "height_px": 63,
+        "det_score": 0.724,
+        "verdict": "too small",
         "seed": 1047857301
       }
     ]

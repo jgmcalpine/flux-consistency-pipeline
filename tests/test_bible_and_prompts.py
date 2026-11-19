@@ -108,3 +108,8 @@ def test_hut_is_described_the_same_inside_and_out(bible):
     hut = "a small round hut with a steep conical thatched roof on a ring of wooden posts"
     assert hut in bible.locations["thatched_hut"].description
     assert hut in bible.locations["jungle_path"].description
+
+
+def test_missing_edit_ref_is_caught(bible):
+    bible.shot("s11").edit_refs.append("refs/nope/missing.png")
+    assert "s11: reference image not found: refs/nope/missing.png" in bible.problems()
