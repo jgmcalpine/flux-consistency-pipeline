@@ -69,6 +69,12 @@
         "from_pick": "s08_flux-2-pro_s1588756856.png"
       }
     ],
-    "final": null
+    "final": {
+      "from": "s08_draft1.mp4",
+      "from_pick": "s08_flux-2-pro_s1588756856.png",
+      "resolution": "hd",
+      "file": "s08_final_hd.mp4",
+      "cost_usd": 0.75
+    }
   }
 }
