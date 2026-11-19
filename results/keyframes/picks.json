@@ -1,0 +1,36 @@
+{
+  "s02": {
+    "shot": "s02",
+    "status": "pass",
+    "pick": "s02_flux-2-pro_s3194447976.png",
+    "candidates": [
+      {
+        "image": "s02_flux-2-pro_s3194447976.png",
+        "faces": 1,
+        "similarity": 0.808,
+        "height_px": 171,
+        "det_score": 0.857,
+        "verdict": "same",
+        "seed": 3194447976
+      },
+      {
+        "image": "s02_flux-2-pro_s3194447977.png",
+        "faces": 1,
+        "similarity": 0.744,
+        "height_px": 114,
+        "det_score": 0.859,
+        "verdict": "same",
+        "seed": 3194447977
+      },
+      {
+        "image": "s02_flux-2-pro_s3194447978.png",
+        "faces": 1,
+        "similarity": 0.657,
+        "height_px": 95,
+        "det_score": 0.812,
+        "verdict": "same",
+        "seed": 3194447978
+      }
+    ]
+  }
+}

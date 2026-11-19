@@ -172,14 +172,26 @@ def keyframes(
     n: int = typer.Option(3, help="Candidates per round (different seeds)."),
     max_rounds: int = typer.Option(2, help="Rounds per shot if no candidate passes face QA."),
     model: str = typer.Option(BASELINE_MODEL, help="Keep it the same as the baseline's."),
+    redo: bool = typer.Option(False, "--redo", help="Regenerate shots that already have a pick."),
 ) -> None:
     """M5: N candidates per shot with the locked refs; face QA picks the best; capped retries."""
     from .keyframes import BY_EYE, DRY_RUN, PASS, run_shot, summary
 
     settings = load_settings()
     bible = load_bible(settings.bible_dir)
+    picks_dir = settings.assets_dir.parent / "results" / "keyframes"
+    picks_file = picks_dir / "picks.json"
+    picks = json.loads(picks_file.read_text()) if picks_file.is_file() else {}
     try:
         shots = [bible.shot(shot)] if shot else bible.shots
+        if not redo:
+            done = [s.id for s in shots if s.id in picks]
+            if done:
+                typer.secho(f"Skipping {', '.join(done)} (already picked; --redo to regenerate).", dim=True)
+            shots = [s for s in shots if s.id not in picks]
+        if not shots:
+            typer.echo("Nothing to do.")
+            return
         per_call = {s.id: keyframe_request(bible, s, model=model).est_cost_usd for s in shots}
     except (ValueError, KeyError) as exc:
         typer.secho(f"  x {exc}", fg="red")
@@ -204,9 +216,6 @@ def keyframes(
             return lambda path: score_one(detect, ref_faces[char_id], path)[0]
 
     work = settings.assets_dir / "keyframes"
-    picks_dir = settings.assets_dir.parent / "results" / "keyframes"
-    picks_file = picks_dir / "picks.json"
-    picks = json.loads(picks_file.read_text()) if picks_file.is_file() else {}
     root = settings.assets_dir.parent
     colour = {PASS: "green", BY_EYE: "yellow", DRY_RUN: "yellow"}
 
