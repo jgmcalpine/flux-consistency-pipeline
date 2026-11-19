@@ -167,12 +167,14 @@ shots:
     character: ismael
     costume: beachwear
     location: thatched_hut
-    props: [necklace, crystal]
+    # The crystal is NOT its own subject here: a separate subject gets drawn as a separate object
+    # (round 2 stood it loose on the table). It is part of the finished necklace, so the action says so.
+    props: [necklace]
     framing: medium wide shot, the hammock and the worktable both in frame
     position: lying stretched out in the hammock on the left, the worktable on the right
     action: >-
-      he lies asleep in the hammock, eyes closed; the finished necklace lies on the worktable, the
-      green crystal now held in its copper cage; the fire pit has burnt out
+      he lies asleep in the hammock, eyes closed; the finished necklace lies flat on the worktable,
+      the small green crystal now held inside its copper cage; the fire pit has burnt out
     mood: peaceful, complete
     lighting: >-
       cold blue moonlight only; the fire pit is dark, burnt out to grey ash with a thin wisp of smoke

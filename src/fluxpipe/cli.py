@@ -1,4 +1,4 @@
-"""Command line: fluxpipe validate | prompts | diff | generate | baseline | keyframes | score | refs | lock | credits | budget"""
+"""Command line: fluxpipe validate | prompts | diff | generate | baseline | keyframes | pick | score | refs | lock | credits | budget"""
 
 from __future__ import annotations
 
@@ -262,6 +262,27 @@ def keyframes(
     if not settings.dry_run:
         typer.echo(f"Picks copied to {picks_dir.relative_to(root)}/ ({picks_file.name} has every score)."
                    f" Look at them, especially 'by eye' and 'below' shots.")
+
+
+@app.command()
+def pick(
+    shot: str = typer.Argument(..., help="Shot id, e.g. s09"),
+    image: str = typer.Argument(..., help="A candidate file name from picks.json, e.g. s09_flux-2-pro_s699773409.png"),
+    note: str = typer.Option("", help="Why (kept in picks.json)."),
+) -> None:
+    """Override a keyframe pick by eye: copy that candidate to results/keyframes/ and record it."""
+    settings = load_settings()
+    picks_dir = settings.assets_dir.parent / "results" / "keyframes"
+    picks_file = picks_dir / "picks.json"
+    picks = json.loads(picks_file.read_text()) if picks_file.is_file() else {}
+    entry = picks.get(shot)
+    if entry is None or image not in [c["image"] for c in entry["candidates"]]:
+        typer.secho(f"  x {image} is not a candidate for {shot} in picks.json", fg="red")
+        raise typer.Exit(2)
+    shutil.copyfile(settings.assets_dir / "keyframes" / shot / image, picks_dir / f"{shot}.png")
+    entry.update(pick=image, picked_by="eye", note=note)
+    picks_file.write_text(json.dumps(dict(sorted(picks.items())), indent=2) + "\n")
+    typer.secho(f"{shot}: picked {image} by eye", fg="green")
 
 
 @app.command()

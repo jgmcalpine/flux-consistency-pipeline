@@ -71,7 +71,7 @@
   },
   "s03": {
     "shot": "s03",
-    "fingerprint": "2c68922b4ae8d451",
+    "fingerprint": "387a5ff240729115",
     "status": "by eye",
     "pick": "s03_flux-2-pro_s3378534654.png",
     "candidates": [
@@ -106,34 +106,34 @@
   },
   "s04": {
     "shot": "s04",
-    "fingerprint": "c401d9df1133a8ce",
+    "fingerprint": "8a7d0ca032ad77ca",
     "status": "pass",
-    "pick": "s04_flux-2-pro_s1459932509.png",
+    "pick": "s04_flux-2-pro_s1459932510.png",
     "candidates": [
       {
         "image": "s04_flux-2-pro_s1459932509.png",
         "faces": 1,
-        "similarity": 0.702,
-        "height_px": 144,
-        "det_score": 0.858,
+        "similarity": 0.689,
+        "height_px": 145,
+        "det_score": 0.864,
         "verdict": "same",
         "seed": 1459932509
       },
       {
         "image": "s04_flux-2-pro_s1459932510.png",
         "faces": 1,
-        "similarity": 0.678,
-        "height_px": 135,
-        "det_score": 0.876,
+        "similarity": 0.732,
+        "height_px": 150,
+        "det_score": 0.895,
         "verdict": "same",
         "seed": 1459932510
       },
       {
         "image": "s04_flux-2-pro_s1459932511.png",
         "faces": 1,
-        "similarity": 0.678,
-        "height_px": 128,
-        "det_score": 0.834,
+        "similarity": 0.692,
+        "height_px": 157,
+        "det_score": 0.883,
         "verdict": "same",
         "seed": 1459932511
       }
@@ -141,7 +141,7 @@
   },
   "s05": {
     "shot": "s05",
-    "fingerprint": "d7652011fa95fde4",
+    "fingerprint": "c205bb3836a1376f",
     "status": "by eye",
     "pick": "s05_flux-2-pro_s537132491.png",
     "candidates": [
@@ -156,54 +156,54 @@
       },
       {
         "image": "s05_flux-2-pro_s537132492.png",
-        "faces": 1,
-        "similarity": 0.313,
-        "height_px": 31,
-        "det_score": 0.857,
-        "verdict": "too small",
+        "faces": 0,
+        "similarity": null,
+        "height_px": null,
+        "det_score": null,
+        "verdict": "no face",
         "seed": 537132492
       },
       {
         "image": "s05_flux-2-pro_s537132493.png",
-        "faces": 1,
-        "similarity": 0.087,
-        "height_px": 37,
-        "det_score": 0.7,
-        "verdict": "too small",
+        "faces": 0,
+        "similarity": null,
+        "height_px": null,
+        "det_score": null,
+        "verdict": "no face",
         "seed": 537132493
       }
     ]
   },
   "s06": {
     "shot": "s06",
-    "fingerprint": "efb710e5c4242254",
+    "fingerprint": "fb330a2e790346be",
     "status": "by eye",
     "pick": "s06_flux-2-pro_s3104484465.png",
     "candidates": [
       {
         "image": "s06_flux-2-pro_s3104484465.png",
-        "faces": 1,
-        "similarity": 0.289,
-        "height_px": 50,
-        "det_score": 0.747,
-        "verdict": "too small",
-        "seed": 3104484465
-      },
-      {
-        "image": "s06_flux-2-pro_s3104484466.png",
         "faces": 0,
         "similarity": null,
         "height_px": null,
         "det_score": null,
         "verdict": "no face",
+        "seed": 3104484465
+      },
+      {
+        "image": "s06_flux-2-pro_s3104484466.png",
+        "faces": 1,
+        "similarity": 0.077,
+        "height_px": 36,
+        "det_score": 0.56,
+        "verdict": "too small",
         "seed": 3104484466
       },
       {
         "image": "s06_flux-2-pro_s3104484467.png",
         "faces": 1,
-        "similarity": 0.104,
-        "height_px": 33,
-        "det_score": 0.673,
+        "similarity": 0.352,
+        "height_px": 59,
+        "det_score": 0.73,
         "verdict": "too small",
         "seed": 3104484467
       }
@@ -211,34 +211,34 @@
   },
   "s07": {
     "shot": "s07",
-    "fingerprint": "a30a1b48578de67d",
+    "fingerprint": "42b913cf152b8aaf",
     "status": "pass",
     "pick": "s07_flux-2-pro_s3456998633.png",
     "candidates": [
       {
         "image": "s07_flux-2-pro_s3456998631.png",
         "faces": 1,
-        "similarity": 0.669,
-        "height_px": 81,
-        "det_score": 0.844,
-        "verdict": "same",
+        "similarity": 0.535,
+        "height_px": 69,
+        "det_score": 0.857,
+        "verdict": "too small",
         "seed": 3456998631
       },
       {
         "image": "s07_flux-2-pro_s3456998632.png",
         "faces": 1,
-        "similarity": 0.618,
-        "height_px": 82,
-        "det_score": 0.814,
-        "verdict": "same",
+        "similarity": 0.628,
+        "height_px": 75,
+        "det_score": 0.848,
+        "verdict": "too small",
         "seed": 3456998632
       },
       {
         "image": "s07_flux-2-pro_s3456998633.png",
         "faces": 1,
-        "similarity": 0.717,
-        "height_px": 88,
-        "det_score": 0.849,
+        "similarity": 0.605,
+        "height_px": 85,
+        "det_score": 0.869,
         "verdict": "same",
         "seed": 3456998633
       }
@@ -246,34 +246,34 @@
   },
   "s08": {
     "shot": "s08",
-    "fingerprint": "225c4c65b6f91112",
+    "fingerprint": "20c850493f5472b3",
     "status": "pass",
-    "pick": "s08_flux-2-pro_s1588756854.png",
+    "pick": "s08_flux-2-pro_s1588756856.png",
     "candidates": [
       {
         "image": "s08_flux-2-pro_s1588756854.png",
         "faces": 1,
-        "similarity": 0.746,
-        "height_px": 221,
-        "det_score": 0.78,
+        "similarity": 0.743,
+        "height_px": 220,
+        "det_score": 0.753,
         "verdict": "same",
         "seed": 1588756854
       },
       {
         "image": "s08_flux-2-pro_s1588756855.png",
         "faces": 1,
-        "similarity": 0.676,
-        "height_px": 305,
-        "det_score": 0.747,
+        "similarity": 0.674,
+        "height_px": 285,
+        "det_score": 0.792,
         "verdict": "same",
         "seed": 1588756855
       },
       {
         "image": "s08_flux-2-pro_s1588756856.png",
         "faces": 1,
-        "similarity": 0.713,
-        "height_px": 254,
-        "det_score": 0.75,
+        "similarity": 0.75,
+        "height_px": 259,
+        "det_score": 0.798,
         "verdict": "same",
         "seed": 1588756856
       }
@@ -281,26 +281,26 @@
   },
   "s09": {
     "shot": "s09",
-    "fingerprint": "dbcb8c249991096d",
-    "status": "pass",
+    "fingerprint": "f640240004881536",
+    "status": "by eye",
     "pick": "s09_flux-2-pro_s699773409.png",
     "candidates": [
       {
         "image": "s09_flux-2-pro_s699773408.png",
-        "faces": 1,
-        "similarity": 0.621,
-        "height_px": 172,
-        "det_score": 0.867,
-        "verdict": "same",
+        "faces": 0,
+        "similarity": null,
+        "height_px": null,
+        "det_score": null,
+        "verdict": "no face",
         "seed": 699773408
       },
       {
         "image": "s09_flux-2-pro_s699773409.png",
-        "faces": 1,
-        "similarity": 0.729,
-        "height_px": 120,
-        "det_score": 0.858,
-        "verdict": "same",
+        "faces": 0,
+        "similarity": null,
+        "height_px": null,
+        "det_score": null,
+        "verdict": "no face",
         "seed": 699773409
       },
       {
@@ -312,74 +312,76 @@
         "verdict": "no face",
         "seed": 699773410
       }
-    ]
+    ],
+    "picked_by": "eye",
+    "note": "clearest reveal: hands lift the cloth, empty cage in the centre"
   },
   "s10": {
     "shot": "s10",
-    "fingerprint": "b95551d3aba90369",
-    "status": "pass",
-    "pick": "s10_flux-2-pro_s1232222214.png",
+    "fingerprint": "acf4048e5bc65c9e",
+    "status": "by eye",
+    "pick": "s10_flux-2-pro_s1232222213.png",
     "candidates": [
       {
         "image": "s10_flux-2-pro_s1232222213.png",
-        "faces": 1,
-        "similarity": 0.638,
-        "height_px": 111,
-        "det_score": 0.83,
-        "verdict": "same",
+        "faces": 0,
+        "similarity": null,
+        "height_px": null,
+        "det_score": null,
+        "verdict": "no face",
         "seed": 1232222213
       },
       {
         "image": "s10_flux-2-pro_s1232222214.png",
-        "faces": 1,
-        "similarity": 0.671,
-        "height_px": 154,
-        "det_score": 0.881,
-        "verdict": "same",
+        "faces": 0,
+        "similarity": null,
+        "height_px": null,
+        "det_score": null,
+        "verdict": "no face",
         "seed": 1232222214
       },
       {
         "image": "s10_flux-2-pro_s1232222215.png",
-        "faces": 1,
-        "similarity": 0.652,
-        "height_px": 116,
-        "det_score": 0.848,
-        "verdict": "same",
+        "faces": 0,
+        "similarity": null,
+        "height_px": null,
+        "det_score": null,
+        "verdict": "no face",
         "seed": 1232222215
       }
     ]
   },
   "s11": {
     "shot": "s11",
-    "fingerprint": "55d6f84274bddee3",
+    "fingerprint": "2883304c3fcf43c5",
     "status": "by eye",
     "pick": "s11_flux-2-pro_s1047857299.png",
     "candidates": [
       {
         "image": "s11_flux-2-pro_s1047857299.png",
         "faces": 1,
-        "similarity": 0.33,
-        "height_px": 64,
-        "det_score": 0.807,
+        "similarity": 0.308,
+        "height_px": 48,
+        "det_score": 0.799,
         "verdict": "too small",
         "seed": 1047857299
       },
       {
         "image": "s11_flux-2-pro_s1047857300.png",
         "faces": 1,
-        "similarity": 0.608,
-        "height_px": 74,
-        "det_score": 0.832,
+        "similarity": 0.239,
+        "height_px": 59,
+        "det_score": 0.706,
         "verdict": "too small",
         "seed": 1047857300
       },
       {
         "image": "s11_flux-2-pro_s1047857301.png",
-        "faces": 1,
-        "similarity": 0.476,
-        "height_px": 67,
-        "det_score": 0.714,
-        "verdict": "too small",
+        "faces": 0,
+        "similarity": null,
+        "height_px": null,
+        "det_score": null,
+        "verdict": "no face",
         "seed": 1047857301
       }
     ]
