@@ -353,50 +353,39 @@
   },
   "s11": {
     "shot": "s11",
-    "fingerprint": "2fe34ec4217c7d78",
+    "fingerprint": "8d1da01242b2daa5",
     "status": "by eye",
-    "pick": "s11_flux-2-pro_s1047857299.png",
+    "pick": "s11_flux-2-pro_s1047857300.png",
     "candidates": [
       {
         "image": "s11_flux-2-pro_s1047857299.png",
-        "faces": 0,
-        "similarity": null,
-        "height_px": null,
-        "det_score": null,
-        "verdict": "no face",
+        "faces": 1,
+        "similarity": 0.071,
+        "height_px": 47,
+        "det_score": 0.715,
+        "verdict": "too small",
         "seed": 1047857299
       },
       {
         "image": "s11_flux-2-pro_s1047857300.png",
         "faces": 1,
-        "similarity": 0.38,
-        "height_px": 50,
-        "det_score": 0.64,
+        "similarity": 0.233,
+        "height_px": 49,
+        "det_score": 0.619,
         "verdict": "too small",
         "seed": 1047857300
       },
       {
         "image": "s11_flux-2-pro_s1047857301.png",
         "faces": 1,
-        "similarity": 0.252,
-        "height_px": 63,
-        "det_score": 0.724,
+        "similarity": 0.304,
+        "height_px": 53,
+        "det_score": 0.748,
         "verdict": "too small",
         "seed": 1047857301
       }
     ],
-    "source": "s11_flux-2-pro_s1047857299.png",
-    "edits": [
-      {
-        "seed": 1047858299,
-        "image": "s11_edit_s1047858299.png",
-        "edit_of": "s11_flux-2-pro_s1047857299.png"
-      },
-      {
-        "seed": 1047858300,
-        "image": "s11_edit_s1047858300.png",
-        "edit_of": "s11_flux-2-pro_s1047857299.png"
-      }
-    ]
+    "picked_by": "eye",
+    "note": "only candidate whose pendant matches ours; the other two drew a different necklace"
   }
 }

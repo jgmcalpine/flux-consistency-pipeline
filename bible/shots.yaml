@@ -180,16 +180,15 @@ shots:
     mood: peaceful, complete
     lighting: >-
       cold blue moonlight only; the fire pit is dark, burnt out to grey ash with a thin wisp of smoke
-    # Fixed by editing the picked frame (`fluxpipe edit s11`), because words couldn't:
-    #  - the plate shows a burning fire and wins over the lighting text (rounds 2-4);
-    #  - the pendant must be the finished one from s10 (crystal in the cage), which no locked
-    #    reference shows. image 2 is its crop from s10's pick (bible/refs/necklace/finished.png).
-    # Its size is anchored to the pendant already on his chest in the frame being edited.
+    # Fixed by editing the picked frame (`fluxpipe edit s11`), because words couldn't: the pendant
+    # must be the finished one from s10 (crystal in the cage), which no locked reference shows.
+    # image 2 is its crop from s10's pick (bible/refs/necklace/finished.png). Its size is anchored to
+    # the pendant already on his chest in the frame being edited. The fire needs no edit: in round 4
+    # (no necklace ref) the lighting text won and the picked frame's fire is already out. An edit
+    # changes only what it must; each extra change is a chance to drift.
     edit: >-
-      Replace the pendant on his chest with the finished pendant held up in image 2, the same small
-      size as the pendant it replaces, hanging on its brown leather cord around his neck. The fire
-      in the fire pit has burnt out: the fire pit holds only cold grey ash and a thin wisp of smoke.
-      The hut is lit only by cold blue moonlight, the warm firelight gone from the man, the hammock
-      and the worktable.
+      Replace the pendant and beaded chain on his chest with the finished pendant held up in image 2,
+      the same small size as the pendant it replaces, hanging on a plain brown leather cord around
+      his neck.
     edit_refs: [refs/necklace/finished.png]
     duration_s: 5

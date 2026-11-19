@@ -327,10 +327,11 @@ def edit(
 @app.command()
 def pick(
     shot: str = typer.Argument(..., help="Shot id, e.g. s09"),
-    image: str = typer.Argument(..., help="A candidate file name from picks.json, e.g. s09_flux-2-pro_s699773409.png"),
+    image: str = typer.Argument(..., help="A candidate's file name or path, e.g. s09_flux-2-pro_s699773409.png"),
     note: str = typer.Option("", help="Why (kept in picks.json)."),
 ) -> None:
     """Override a keyframe pick by eye: copy that candidate to results/keyframes/ and record it."""
+    image = Path(image).name  # a path copied from the terminal works as well as the bare name
     settings = load_settings()
     picks_dir = settings.assets_dir.parent / "results" / "keyframes"
     picks_file = picks_dir / "picks.json"
@@ -338,7 +339,7 @@ def pick(
     entry = picks.get(shot)
     choices = [] if entry is None else [c["image"] for c in entry["candidates"] + entry.get("edits", [])]
     if image not in choices:
-        typer.secho(f"  x {image} is not a candidate for {shot} in picks.json", fg="red")
+        typer.secho(f"  x {image} is not a candidate for {shot}. Candidates: {', '.join(choices)}", fg="red")
         raise typer.Exit(2)
     shutil.copyfile(settings.assets_dir / "keyframes" / shot / image, picks_dir / f"{shot}.png")
     entry.update(pick=image, picked_by="eye", note=note)
