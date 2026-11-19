@@ -8,6 +8,8 @@
       "similarity": 0.259,
       "height_px": 150,
       "det_score": 0.851,
+      "pitch": -25.3,
+      "yaw": 46.6,
       "verdict": "different"
     },
     {
@@ -16,7 +18,9 @@
       "similarity": 0.265,
       "height_px": 157,
       "det_score": 0.846,
-      "verdict": "different"
+      "pitch": -37.4,
+      "yaw": 8.6,
+      "verdict": "turned away"
     },
     {
       "image": "s03_flux-2-pro_s3378534654.png",
@@ -24,6 +28,8 @@
       "similarity": null,
       "height_px": null,
       "det_score": null,
+      "pitch": null,
+      "yaw": null,
       "verdict": "no face"
     },
     {
@@ -32,6 +38,8 @@
       "similarity": 0.257,
       "height_px": 207,
       "det_score": 0.649,
+      "pitch": -28.7,
+      "yaw": 54.8,
       "verdict": "different"
     },
     {
@@ -40,6 +48,8 @@
       "similarity": 0.103,
       "height_px": 61,
       "det_score": 0.66,
+      "pitch": 43.3,
+      "yaw": 83.1,
       "verdict": "too small"
     },
     {
@@ -48,7 +58,9 @@
       "similarity": 0.197,
       "height_px": 80,
       "det_score": 0.804,
-      "verdict": "different"
+      "pitch": 15.6,
+      "yaw": 71.5,
+      "verdict": "turned away"
     },
     {
       "image": "s07_flux-2-pro_s3456998631.png",
@@ -56,6 +68,8 @@
       "similarity": 0.165,
       "height_px": 102,
       "det_score": 0.699,
+      "pitch": -20.0,
+      "yaw": 59.4,
       "verdict": "different"
     },
     {
@@ -64,6 +78,8 @@
       "similarity": 0.344,
       "height_px": 212,
       "det_score": 0.709,
+      "pitch": -23.3,
+      "yaw": 40.9,
       "verdict": "different"
     },
     {
@@ -72,7 +88,9 @@
       "similarity": 0.319,
       "height_px": 233,
       "det_score": 0.728,
-      "verdict": "different"
+      "pitch": -18.4,
+      "yaw": 64.0,
+      "verdict": "turned away"
     },
     {
       "image": "s10_flux-2-pro_s1232222213.png",
@@ -80,7 +98,9 @@
       "similarity": 0.186,
       "height_px": 289,
       "det_score": 0.612,
-      "verdict": "different"
+      "pitch": -48.2,
+      "yaw": -13.9,
+      "verdict": "turned away"
     },
     {
       "image": "s11_flux-2-pro_s1047857299.png",
@@ -88,45 +108,21 @@
       "similarity": 0.135,
       "height_px": 143,
       "det_score": 0.742,
+      "pitch": -20.3,
+      "yaw": -37.6,
       "verdict": "different"
     }
   ],
   "pairwise": [
-    0.303,
     0.288,
-    0.334,
     0.309,
     0.261,
-    0.351,
-    0.292,
     0.174,
-    0.377,
-    0.268,
-    0.378,
-    0.245,
-    0.341,
-    0.324,
-    0.256,
-    0.263,
     0.245,
     0.258,
-    0.275,
-    0.228,
     0.152,
-    0.336,
-    0.354,
-    0.233,
-    0.292,
-    0.226,
     0.368,
-    0.456,
-    0.343,
     0.358,
-    0.418,
-    0.306,
-    0.167,
-    0.225,
-    0.292,
-    0.322
+    0.167
   ]
 }

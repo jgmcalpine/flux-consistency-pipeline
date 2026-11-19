@@ -33,6 +33,14 @@ def test_largest_face_is_the_subject():
     assert largest([]) is None
 
 
+def test_turned_away_faces_are_not_judged():
+    down = FaceScore("x.png", 1, 0.39, 200, 0.9, pitch=-55.9, yaw=-43.2)
+    profile = FaceScore("x.png", 1, 0.7, 200, 0.9, pitch=-4.0, yaw=55.7)  # s04: still judged
+    assert down.verdict == "turned away" and profile.verdict == "same"
+    assert FaceScore("x.png", 1, 0.39, 200, 0.9, yaw=-70).verdict == "turned away"
+    assert down.as_dict()["pitch"] == -55.9
+
+
 def test_scores_and_verdicts():
     detect = fake({
         "ref.png": [FaceHit(ME, 300, 0.99)],

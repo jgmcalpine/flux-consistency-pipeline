@@ -6,7 +6,11 @@ the model re-imagines the face frame by frame. So we sample frames (2 a second i
   - first: the opening frame, which should match the keyframe it started from;
   - min:   the worst moment in the clip;
   - drift: first - min, how far the identity wanders during the motion.
-Frames whose face is too small or missing (wide shots, hands only) are left out, as for stills.
+Frames whose face is too small or missing (wide shots, hands only) are left out, as for stills,
+and so are frames where the head is turned away (looking steeply down, in profile): the face
+model can't vouch for those, and a low score there would show a head turn as identity drift.
+`coverage` says what share of the clip was judged, so 2 judged frames out of 10 reads as weak
+evidence; the rest of the clip needs an eye.
 """
 
 from __future__ import annotations
@@ -34,11 +38,14 @@ def extract_frames(clip: Path, out_dir: Path, fps: float = 2.0) -> list[Path]:
 
 def summarize(scores: list[FaceScore]) -> dict:
     judged = [s.similarity for s in scores if s.verdict in ("same", "different")]
+    turned = sum(s.verdict == "turned away" for s in scores)
     if not judged:
-        return {"frames": len(scores), "judged": 0}
+        return {"frames": len(scores), "judged": 0, "turned_away": turned}
     return {
         "frames": len(scores),
         "judged": len(judged),
+        "turned_away": turned,
+        "coverage": round(len(judged) / len(scores), 2),
         "first": judged[0],
         "mean": round(sum(judged) / len(judged), 3),
         "min": min(judged),

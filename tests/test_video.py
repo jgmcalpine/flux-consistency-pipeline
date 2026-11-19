@@ -104,8 +104,9 @@ def test_video_job_keeps_poll_and_leaves_blobs_out_of_the_ledger(tmp_path):
 
 
 def test_clip_summary_reports_drift_and_skips_small_faces():
-    def fs(sim, h=200):
-        return FaceScore("f", 1, sim, h, 0.9)
-    s = summarize([fs(0.8), fs(0.6), fs(0.3, h=40), fs(None, None), fs(0.7)])
-    assert s == {"frames": 5, "judged": 3, "first": 0.8, "mean": 0.7, "min": 0.6, "drift": 0.2}
-    assert summarize([fs(None, None)]) == {"frames": 1, "judged": 0}
+    def fs(sim, h=200, pitch=-10.0):
+        return FaceScore("f", 1, sim, h, 0.9, pitch=pitch, yaw=0.0)
+    s = summarize([fs(0.8), fs(0.6), fs(0.3, h=40), fs(None, None), fs(0.7), fs(0.39, pitch=-60)])
+    assert s == {"frames": 6, "judged": 3, "turned_away": 1, "coverage": 0.5,
+                 "first": 0.8, "mean": 0.7, "min": 0.6, "drift": 0.2}
+    assert summarize([fs(None, None)]) == {"frames": 1, "judged": 0, "turned_away": 0}

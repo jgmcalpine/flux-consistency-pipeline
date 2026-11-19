@@ -8,6 +8,8 @@
       "similarity": 0.565,
       "height_px": 75,
       "det_score": 0.712,
+      "pitch": -13.2,
+      "yaw": 71.8,
       "verdict": "too small"
     },
     {
@@ -16,6 +18,8 @@
       "similarity": 0.808,
       "height_px": 171,
       "det_score": 0.857,
+      "pitch": -15.9,
+      "yaw": -3.7,
       "verdict": "same"
     },
     {
@@ -24,6 +28,8 @@
       "similarity": null,
       "height_px": null,
       "det_score": null,
+      "pitch": null,
+      "yaw": null,
       "verdict": "no face"
     },
     {
@@ -32,6 +38,8 @@
       "similarity": 0.732,
       "height_px": 150,
       "det_score": 0.895,
+      "pitch": -4.0,
+      "yaw": 55.7,
       "verdict": "same"
     },
     {
@@ -40,6 +48,8 @@
       "similarity": null,
       "height_px": null,
       "det_score": null,
+      "pitch": null,
+      "yaw": null,
       "verdict": "no face"
     },
     {
@@ -48,6 +58,8 @@
       "similarity": null,
       "height_px": null,
       "det_score": null,
+      "pitch": null,
+      "yaw": null,
       "verdict": "no face"
     },
     {
@@ -56,6 +68,8 @@
       "similarity": 0.605,
       "height_px": 85,
       "det_score": 0.869,
+      "pitch": -22.8,
+      "yaw": 7.6,
       "verdict": "same"
     },
     {
@@ -64,6 +78,8 @@
       "similarity": 0.75,
       "height_px": 259,
       "det_score": 0.798,
+      "pitch": -6.1,
+      "yaw": 46.8,
       "verdict": "same"
     },
     {
@@ -72,6 +88,8 @@
       "similarity": null,
       "height_px": null,
       "det_score": null,
+      "pitch": null,
+      "yaw": null,
       "verdict": "no face"
     },
     {
@@ -80,6 +98,8 @@
       "similarity": null,
       "height_px": null,
       "det_score": null,
+      "pitch": null,
+      "yaw": null,
       "verdict": "no face"
     },
     {
@@ -88,6 +108,8 @@
       "similarity": 0.233,
       "height_px": 49,
       "det_score": 0.619,
+      "pitch": 9.8,
+      "yaw": 37.6,
       "verdict": "too small"
     }
   ],

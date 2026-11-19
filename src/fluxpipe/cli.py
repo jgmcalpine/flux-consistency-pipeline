@@ -455,7 +455,7 @@ def score_clip(
     fps: float = typer.Option(2.0, help="Frames sampled per second."),
 ) -> None:
     """Video QA: face identity in frames sampled across a clip (first, mean, min, drift). Free."""
-    from .qa.face import insightface_detector, score_images
+    from .qa.face import MAX_PITCH_DEG, MAX_YAW_DEG, insightface_detector, score_images
     from .qa.video import extract_frames, summarize
 
     settings = load_settings()
@@ -469,13 +469,18 @@ def score_clip(
     scores, _ = score_images(insightface_detector(), bible.ref_path(char.reference_images[0]), frames)
     for i, sc in enumerate(scores):
         sim = f"{sc.similarity:.3f}" if sc.similarity is not None else "  -  "
-        typer.echo(f"  t={i / fps:4.1f}s  {sim}  {sc.verdict}")
+        pose = f"pitch {sc.pitch:6.1f}  yaw {sc.yaw:6.1f}" if sc.pitch is not None else " " * 25
+        typer.echo(f"  t={i / fps:4.1f}s  {sim}  {pose}  {sc.verdict}")
     summary = summarize(scores)
     if summary["judged"]:
         typer.secho(f"first {summary['first']:.3f}, mean {summary['mean']:.3f}, min {summary['min']:.3f},"
-                    f" drift {summary['drift']:.3f} over {summary['judged']} judged frame(s)", bold=True)
+                    f" drift {summary['drift']:.3f} over {summary['judged']} of {summary['frames']} frames",
+                    bold=True)
     else:
-        typer.echo("No judgeable face in any frame (wide shot or hands only): judge this clip by eye.")
+        typer.echo("No judgeable face in any frame (wide, hands only or turned away): judge this clip by eye.")
+    if summary["turned_away"]:
+        typer.secho(f"  {summary['turned_away']} frame(s) not judged: head turned more than "
+                    f"{MAX_PITCH_DEG} deg up/down or {MAX_YAW_DEG} deg sideways. Check those by eye.", dim=True)
     out = clip.with_suffix(".faces.json")
     out.write_text(json.dumps({"summary": summary, "frames": [x.as_dict() for x in scores]}, indent=2) + "\n")
     typer.secho(f"  wrote {out}", dim=True)
@@ -502,7 +507,8 @@ def score(
 
     typer.echo("Loading InsightFace (buffalo_l)...")
     scores, pairs = score_images(insightface_detector(), bible.ref_path(char.reference_images[0]), images)
-    colour = {"same": "green", "different": "red", "too small": "yellow", "no face": "yellow"}
+    colour = {"same": "green", "different": "red", "too small": "yellow", "no face": "yellow",
+              "turned away": "yellow"}
     for sc in scores:
         sim = f"{sc.similarity:.3f}" if sc.similarity is not None else "  -  "
         px = f"{sc.height_px}px" if sc.height_px else "-"
@@ -510,7 +516,7 @@ def score(
     judged = [sc.similarity for sc in scores if sc.verdict in ("same", "different")]
     if judged:
         typer.echo(f"Mean over {len(judged)} judgeable face(s): {sum(judged) / len(judged):.3f}"
-                   f"  (same person >= {SAME_PERSON}; faces under {SMALL_FACE_PX}px not judged)")
+                   f"  (same person >= {SAME_PERSON}; faces under {SMALL_FACE_PX}px or turned away not judged)")
     if pairs:
         typer.echo(f"Shot vs shot ({len(pairs)} pairs): mean {sum(pairs) / len(pairs):.3f},"
                    f" min {min(pairs):.3f}, max {max(pairs):.3f}  (is it the same man in every shot?)")
