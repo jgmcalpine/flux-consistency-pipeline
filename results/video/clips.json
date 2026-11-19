@@ -8,6 +8,11 @@
         "draft_cache": "s02_draft1.cache.bin"
       }
     ],
-    "final": null
+    "final": {
+      "from": "s02_draft1.mp4",
+      "resolution": "hd",
+      "file": "s02_final_hd.mp4",
+      "cost_usd": 0.75
+    }
   }
 }
