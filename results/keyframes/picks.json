@@ -110,44 +110,46 @@
   },
   "s04": {
     "shot": "s04",
-    "fingerprint": "ade542944d8ef7c9",
+    "fingerprint": "81b2162619c4f596",
     "status": "pass",
     "pick": "s04_flux-2-pro_s1459932511.png",
     "candidates": [
       {
         "image": "s04_flux-2-pro_s1459932509.png",
         "faces": 1,
-        "similarity": 0.71,
-        "height_px": 147,
-        "det_score": 0.836,
-        "pitch": -19.3,
-        "yaw": 64.6,
+        "similarity": 0.624,
+        "height_px": 134,
+        "det_score": 0.827,
+        "pitch": -15.9,
+        "yaw": 67.3,
         "verdict": "turned away",
         "seed": 1459932509
       },
       {
         "image": "s04_flux-2-pro_s1459932510.png",
         "faces": 1,
-        "similarity": 0.632,
-        "height_px": 140,
-        "det_score": 0.857,
-        "pitch": -29.9,
-        "yaw": 57.2,
-        "verdict": "same",
+        "similarity": 0.67,
+        "height_px": 129,
+        "det_score": 0.836,
+        "pitch": -8.3,
+        "yaw": 64.8,
+        "verdict": "turned away",
         "seed": 1459932510
       },
       {
         "image": "s04_flux-2-pro_s1459932511.png",
         "faces": 1,
-        "similarity": 0.683,
-        "height_px": 129,
-        "det_score": 0.838,
-        "pitch": -22.0,
-        "yaw": 57.3,
+        "similarity": 0.666,
+        "height_px": 127,
+        "det_score": 0.848,
+        "pitch": -10.8,
+        "yaw": 58.8,
         "verdict": "same",
         "seed": 1459932511
       }
-    ]
+    ],
+    "picked_by": "eye",
+    "note": ""
   },
   "s05": {
     "shot": "s05",
