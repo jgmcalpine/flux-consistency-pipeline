@@ -5,7 +5,7 @@ from pydantic import ValidationError
 
 from fluxpipe.bible import Camera, Character, load_bible
 from fluxpipe.config import ROOT
-from fluxpipe.prompts import as_json, as_text, build_structured, diff
+from fluxpipe.prompts import as_json, as_text, build_structured, diff, reference_images
 
 
 @pytest.fixture
@@ -75,3 +75,36 @@ def test_props_are_described_word_for_word_in_every_shot_that_shows_them(bible):
 def test_unknown_prop_is_caught(bible):
     bible.shots[0].props = ["golden_idol"]
     assert any("unknown prop 'golden_idol'" in p for p in bible.problems())
+
+
+def test_plate_false_leaves_the_location_plate_off(bible):
+    shot = bible.shot("s09")
+    assert shot.plate is False
+    assert not any("plate" in r for r in reference_images(bible, shot))
+    assert "the location from image" not in build_structured(bible, shot)["scene"]
+
+
+def test_hands_only_shots_attach_no_face_reference(bible):
+    for shot in bible.shots:
+        has_face_ref = any(r.endswith("face.png") for r in reference_images(bible, shot))
+        assert has_face_ref == shot.face
+
+
+def test_image_numbers_follow_what_is_attached(bible):
+    p = build_structured(bible, bible.shot("s10"))  # no face ref: the costume sheet is image 1
+    assert "exactly the outfit shown in image 1" in p["subjects"][0]["description"]
+    assert "image 2" in p["subjects"][1]["description"] and "image 3" in p["subjects"][2]["description"]
+
+
+def test_shot_overrides_for_scene_and_lighting(bible):
+    loc = bible.locations["thatched_hut"]
+    s11 = build_structured(bible, bible.shot("s11"))
+    assert s11["lighting"] != loc.lighting and "burnt out" in s11["lighting"]
+    assert build_structured(bible, bible.shot("s07"))["lighting"] == loc.lighting
+    assert loc.description not in build_structured(bible, bible.shot("s09"))["scene"]
+
+
+def test_hut_is_described_the_same_inside_and_out(bible):
+    hut = "a small round hut with a steep conical thatched roof on a ring of wooden posts"
+    assert hut in bible.locations["thatched_hut"].description
+    assert hut in bible.locations["jungle_path"].description

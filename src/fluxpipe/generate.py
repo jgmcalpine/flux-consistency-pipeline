@@ -11,6 +11,8 @@ Decisions that matter for consistency:
 
 from __future__ import annotations
 
+import hashlib
+import json
 import zlib
 from dataclasses import dataclass
 
@@ -69,6 +71,17 @@ def build_request(
         payload["input_image" if i == 1 else f"input_image_{i}"] = as_base64(path)
     est = estimate_cost(model, width=width, height=height, refs=[png_size(p) for p in ref_files])
     return Request(model, payload, est, [str(p) for p in ref_files])
+
+
+def fingerprint(endpoint: str, payload: dict, ref_files: list[str | Path]) -> str:
+    """What a request asks for, minus the seed: model, prompt, settings, and the reference images'
+    actual bytes (so re-locking a reference changes it too). Same fingerprint = same shot request."""
+    h = hashlib.sha256()
+    settings = {k: v for k, v in payload.items() if k != "seed" and not k.startswith("input_image")}
+    h.update(json.dumps([endpoint, settings], sort_keys=True).encode())
+    for f in ref_files:
+        h.update(hashlib.sha256(Path(f).read_bytes()).digest())
+    return h.hexdigest()[:16]
 
 
 def shot_seed(shot_id: str) -> int:

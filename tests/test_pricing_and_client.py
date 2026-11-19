@@ -151,3 +151,16 @@ def test_spend_cap_blocks_before_any_request(ledger, tmp_path):
     with pytest.raises(SpendCapExceeded):
         run(client, tmp_path, est=5.0)
     assert seen == []
+
+
+def test_fingerprint_ignores_seed_but_not_prompt_or_refs(bible, tmp_path):
+    from fluxpipe.generate import fingerprint
+
+    a = keyframe_request(bible, bible.shot("s02"), model="flux-2-pro", seed=1)
+    b = keyframe_request(bible, bible.shot("s02"), model="flux-2-pro", seed=2)
+    assert fingerprint(a.endpoint, a.payload, a.refs) == fingerprint(b.endpoint, b.payload, b.refs)
+    changed = {**a.payload, "prompt": a.payload["prompt"] + " "}
+    assert fingerprint(a.endpoint, changed, a.refs) != fingerprint(a.endpoint, a.payload, a.refs)
+    relocked = tmp_path / "face.png"
+    relocked.write_bytes(b"a different image")
+    assert fingerprint(a.endpoint, a.payload, [relocked, *a.refs[1:]]) != fingerprint(a.endpoint, a.payload, a.refs)

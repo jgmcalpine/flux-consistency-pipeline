@@ -1,8 +1,10 @@
 # The thing the story is about: it must look identical in every shot it appears in.
 id: crystal
 name: Green crystal
+# Size: the locked reference has nothing to show scale, so the words must. Round 1 drew it
+# palm-sized in s03, s08 and s10. Shots hold it between thumb and forefinger to pin the scale.
 description: >-
-  a raw six-sided green crystal about the length of a thumb, in color #3FA66B,
-  cloudy at the base and clear at its pointed tip
+  a small raw six-sided green crystal, about 5 cm long, no longer than a man's thumb,
+  in color #3FA66B, cloudy white at the base and clear green at its pointed tip
 reference_images:
 - refs/crystal/prop.png

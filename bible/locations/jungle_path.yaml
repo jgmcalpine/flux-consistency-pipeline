@@ -1,8 +1,9 @@
 id: jungle_path
 name: Jungle path
+# The hut at the top is his hut, the only building here: the same words as in thatched_hut.
 description: >-
-  a narrow, winding dirt path climbing through dense jungle to a grassy ridge, a small thatched
-  hut at the top, a slow mist rising from the canopy below
+  a narrow, winding dirt path climbing through dense jungle to a grassy ridge, at the top of the
+  ridge his hut, a small round hut with a steep conical thatched roof on a ring of wooden posts, open sides above a low wooden railing, a slow mist rising from the canopy below
 lighting: golden hour turning to dusk, low warm sun raking through the trees, long soft shadows
 palette: ["#4F6B4A", "#D9A441", "#8A5A3B", "#2B2F33"]
 reference_images:

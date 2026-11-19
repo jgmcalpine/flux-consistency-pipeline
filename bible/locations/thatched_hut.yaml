@@ -1,10 +1,13 @@
 id: thatched_hut
 name: Thatched hut
+# The same hut as on the ridge in jungle_path: keep the two descriptions of the building identical.
+# The fire's state (burning / burnt out) is not described here: each shot says it, in its action
+# or its lighting override. A state left to the location drifts (s07's fire went missing in round 1).
 description: >-
-  inside a small thatched hut, a small fire in the center, a hammock hanging in one corner from
-  the rafters, jewelry-making tools scattered around, and a small worktable next to the hammock
-  with copper wire, beads, small polished river stones and small hand tools on it
-lighting: cold blue night outside, warm amber glow from the fire
+  inside a small round hut with a steep conical thatched roof on a ring of wooden posts, open sides above a low wooden railing: a stone fire pit in the centre of the earth floor,
+  a single hammock hanging between two posts on the left, and a small worktable on the right with
+  copper wire, beads, small polished river stones and small hand tools on it
+lighting: cold blue night outside, warm amber firelight from the fire burning in the fire pit
 palette: ["#1d2a3a", "#c98a3c", "#e9d8a6"]
 reference_images:
 - refs/thatched_hut/plate.png

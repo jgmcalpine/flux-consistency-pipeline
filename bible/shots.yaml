@@ -1,9 +1,14 @@
 # The shot list. Every shot references the bible by id; prompts are built from it.
 # Story: Ismael finds a green crystal in a jungle river, carries it home at dusk,
-# sets it into the necklace he has been making, and rests.
+# sets it into the necklace he has been making, and falls asleep in his hammock as the fire dies.
 #
-# Screen direction: on the walk home he always moves LEFT TO RIGHT (s05, s06).
-# Face shots for identity QA: s02, s04, s07, s08, s11 (s01, s06 partly).
+# Walk home: s05 he climbs the path AWAY from camera toward his hut on the ridge (the plate's
+# view); s06 he reaches it moving LEFT TO RIGHT. His hut is the only building in the film.
+# Fire: burning in s07-s10, burnt out in s11. Each shot says so; the location doesn't.
+# Crystal: small (thumb length); shots hold it between thumb and forefinger to pin the scale.
+# Face shots for identity QA: s02, s04, s07, s08 (s01, s05, s06, s11 too small to judge).
+# s03, s09, s10 are hands only (face: false): QA fails a candidate that shows his face.
+# plate: false = don't attach the location plate (it copies its camera position; see CLAUDE.md).
 # s10 is the riskiest shot (fingers + small objects). If it fails, cut s09 -> s11.
 
 # Applies to every shot. One look for the whole film = one place to change it.
@@ -45,11 +50,14 @@ shots:
     costume: beachwear
     location: riverbank
     props: [crystal]
-    framing: close-up of his hands and the pan, his face out of frame
+    framing: close-up of his hands and the metal pan, his face out of frame
     camera: { lens: 85mm }
-    position: hands in the centre of the frame
-    action: wet fingers lift the green crystal out of the gravel, water running off it
+    position: hands in the centre of the frame, holding the pan of wet gravel
+    action: >-
+      his wet thumb and forefinger pick the small green crystal out of the gravel in the metal pan,
+      water running off it
     mood: discovery
+    face: false
     duration_s: 5
 
   - id: s04
@@ -60,7 +68,9 @@ shots:
     framing: medium close-up, head and shoulders
     camera: { lens: 85mm }
     position: centre frame, three-quarter view facing right
-    action: he smiles, slips the crystal into the satchel and lifts its strap onto his shoulder
+    action: >-
+      he smiles, slips the small crystal held between his thumb and forefinger into the satchel and
+      lifts its strap onto his shoulder
     mood: quiet joy
     duration_s: 5
 
@@ -70,10 +80,10 @@ shots:
     costume: beachwear
     location: jungle_path
     props: [satchel]
-    framing: wide shot, the man small on the path, jungle all around
+    framing: wide shot, the path leading up to his hut on the ridge, the man small on the path
     camera: { lens: 24mm, depth_of_field: "deep, everything in focus" }
-    position: walking from left to right, lower third of the frame, satchel on his shoulder
-    action: he climbs the winding path at an easy pace
+    position: walking up the path away from the camera, lower third of the frame, satchel on his shoulder
+    action: he climbs the winding path toward his hut at an easy pace
     mood: content, unhurried
     duration_s: 5
 
@@ -82,22 +92,26 @@ shots:
     costume: beachwear
     location: jungle_path
     props: [satchel]
-    framing: wide shot, the hut on the right of the frame
+    framing: medium wide shot on the top of the ridge, his hut on the right of the frame
     camera: { lens: 35mm }
-    position: walking from left to right toward the hut's doorway
-    action: he reaches the hut as dusk falls, warm firelight glowing in its doorway
+    position: walking from left to right toward his hut
+    action: he reaches his hut as dusk falls, warm firelight glowing inside it through the open sides
     mood: homecoming
+    plate: false  # the plate's hut is far away at the top of the path; here we are beside it
+    lighting: dusk, the last blue light of the day, warm firelight glowing inside the hut
     duration_s: 5
 
-  # --- Inside the hut, night ---
+  # --- Inside the hut, night. The fire burns in s07-s10 and is out in s11. ---
   - id: s07
     character: ismael
     costume: beachwear
     location: thatched_hut
     props: [satchel]
-    framing: medium shot, waist up
+    framing: medium shot, waist up, the burning fire pit in frame
     position: centre frame beside the worktable
-    action: he drops the satchel on the floor and sits down at the worktable
+    action: >-
+      he drops the satchel on the floor and sits down at the worktable, the fire burning brightly
+      in the fire pit beside him
     mood: eager
     duration_s: 5
 
@@ -108,8 +122,10 @@ shots:
     props: [crystal]
     framing: close-up of his face and the crystal
     camera: { lens: 85mm }
-    position: face left of centre, the crystal held up on the right
-    action: he holds the crystal up to the firelight and turns it slowly, smiling
+    position: face left of centre, the small crystal held up on the right
+    action: >-
+      he holds the small crystal up to the firelight between his thumb and forefinger and turns it
+      slowly, smiling, the fire burning behind him
     mood: delight
     duration_s: 5
 
@@ -118,11 +134,15 @@ shots:
     costume: beachwear
     location: thatched_hut
     props: [necklace]
-    framing: close-up of the worktable, his hands entering the frame
+    framing: close-up of the top of the worktable, only his hands and forearms in frame, his face out of frame
     camera: { angle: slightly above, lens: 50mm }
     position: the necklace in the centre of the table
-    action: he lifts a cloth to reveal the necklace, its copper cage empty
+    action: he lifts a cloth to reveal the necklace lying on the table, its copper cage empty
     mood: anticipation
+    plate: false  # a close-up; the plate would pull it back to the wide view of the hut
+    scene: the dark wooden top of the small worktable in his hut, copper wire, beads and small hand tools on it
+    lighting: warm amber firelight from the fire burning just out of frame
+    face: false
     duration_s: 5
 
   - id: s10
@@ -130,11 +150,17 @@ shots:
     costume: beachwear
     location: thatched_hut
     props: [crystal, necklace]
-    framing: extreme close-up of his hands, the necklace and the crystal
+    framing: extreme close-up of his hands, the necklace and the crystal, his face out of frame
     camera: { angle: slightly above, lens: 100mm macro }
-    position: hands in the centre of the frame
-    action: his fingers slide the crystal into the empty copper cage and press the prongs closed around it
+    position: hands in the centre of the frame, above the worktable
+    action: >-
+      his fingers slide the small crystal into the empty copper cage, which is exactly its length,
+      and press the prongs closed around it
     mood: careful, precise
+    plate: false
+    scene: the dark wooden top of the small worktable in his hut, copper wire, beads and small hand tools on it
+    lighting: warm amber firelight from the fire burning just out of frame
+    face: false
     duration_s: 5
 
   - id: s11
@@ -142,8 +168,12 @@ shots:
     costume: beachwear
     location: thatched_hut
     props: [necklace, crystal]
-    framing: medium wide shot of the hammock and the fire
-    position: lying in the hammock, right of frame, the fire in the foreground on the left
-    action: he rests in the hammock holding the finished necklace, the green crystal now held in its copper cage, his eyes closing
+    framing: medium wide shot, the hammock and the worktable both in frame
+    position: lying stretched out in the hammock on the left, the worktable on the right
+    action: >-
+      he lies asleep in the hammock, eyes closed; the finished necklace lies on the worktable, the
+      green crystal now held in its copper cage; the fire pit has burnt out
     mood: peaceful, complete
+    lighting: >-
+      cold blue moonlight only; the fire pit is dark, burnt out to grey ash with a thin wisp of smoke
     duration_s: 5

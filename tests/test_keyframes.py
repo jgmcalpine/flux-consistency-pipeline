@@ -3,7 +3,9 @@
 from pathlib import Path
 
 from fluxpipe.generate import shot_seed
-from fluxpipe.keyframes import BELOW, BY_EYE, DRY_RUN, PASS, candidate_seeds, run_shot, summary
+from fluxpipe.keyframes import (
+    BELOW, BY_EYE, DRY_RUN, FACE_SHOWN, PASS, candidate_seeds, run_shot, summary,
+)
 from fluxpipe.qa.face import FaceScore
 
 
@@ -66,3 +68,21 @@ def test_summary_names_the_pick_and_every_score():
     s = summary(run_shot("s08", n=1, max_rounds=1, generate=gen, judge=judge))
     assert s["status"] == PASS and s["pick"] == s["candidates"][0]["image"]
     assert s["candidates"][0]["similarity"] == 0.7
+
+
+def test_hands_only_shot_rejects_candidates_that_show_his_face():
+    gen, judge, made = scripted([face(0.7), face(None), face(0.6)])
+    r = run_shot("s10", n=3, max_rounds=2, generate=gen, judge=judge, expect_face=False)
+    assert r.status == BY_EYE and r.pick.face.similarity is None and len(made) == 3
+
+
+def test_hands_only_shot_retries_when_every_candidate_shows_a_face():
+    gen, judge, made = scripted([face(0.7), face(0.6), face(None), face(0.5)])
+    r = run_shot("s10", n=2, max_rounds=2, generate=gen, judge=judge, expect_face=False)
+    assert len(made) == 4 and r.status == BY_EYE and r.pick.face.similarity is None
+
+
+def test_hands_only_shot_flags_faces_after_the_last_round():
+    gen, judge, _ = scripted([face(0.7), face(0.6)])
+    r = run_shot("s09", n=1, max_rounds=2, generate=gen, judge=judge, expect_face=False)
+    assert r.status == FACE_SHOWN

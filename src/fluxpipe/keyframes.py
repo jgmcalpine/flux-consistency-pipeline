@@ -10,8 +10,11 @@ Rules for a shot:
     used), the rest follow it, so every candidate is reproducible.
   - If a candidate's face reaches SAME_PERSON, the shot passes and we stop paying.
   - If none does, another round of N, up to max_rounds. Then keep the best and flag it.
-  - If no candidate has a face big enough to judge (hands-only and wide shots), retrying can't
-    help: keep them all and flag the shot for a human to pick by eye.
+  - If no candidate has a face big enough to judge (wide shots), retrying can't help: keep them
+    all and flag the shot for a human to pick by eye.
+  - Hands-only shots (face: false in the bible) invert the rule: a candidate showing his face is
+    wrong. Round 1 "passed" s09/s10 on exactly that. Faceless candidates go to a human by eye;
+    if every candidate shows a face, another round.
 
 Nothing here talks to the API or loads a model; the CLI passes those in. That keeps the logic testable.
 """
@@ -29,6 +32,7 @@ PASS = "pass"  # a candidate reached SAME_PERSON
 BELOW = "below"  # judged, but no candidate reached it within max_rounds
 BY_EYE = "by eye"  # no judgeable face in the shot; a human picks
 DRY_RUN = "dry run"  # nothing generated, nothing to judge
+FACE_SHOWN = "face shown"  # a hands-only shot where every candidate showed his face
 
 
 @dataclass
@@ -62,7 +66,8 @@ Judge = Callable[[Path], FaceScore]
 
 
 def run_shot(
-    shot_id: str, *, n: int, max_rounds: int, generate: Generate, judge: Judge | None
+    shot_id: str, *, n: int, max_rounds: int, generate: Generate, judge: Judge | None,
+    expect_face: bool = True,
 ) -> ShotResult:
     result = ShotResult(shot_id, DRY_RUN)
     for round_ in range(max_rounds):
@@ -75,6 +80,13 @@ def run_shot(
             return result  # dry run
 
         judged = [c for c in result.candidates if c.judgeable]
+        if not expect_face:
+            faceless = [c for c in result.candidates if not c.judgeable]
+            if faceless:
+                result.status, result.pick = BY_EYE, faceless[0]
+                return result
+            result.status, result.pick = FACE_SHOWN, result.candidates[0]
+            continue  # every candidate showed his face: try another round
         if not judged:
             result.status, result.pick = BY_EYE, result.candidates[0]
             return result  # no face to measure: another round would cost money for nothing
@@ -87,10 +99,12 @@ def run_shot(
     return result
 
 
-def summary(result: ShotResult) -> dict:
-    """What goes in picks.json: every candidate's score, and which one we kept and why."""
+def summary(result: ShotResult, fingerprint: str | None = None) -> dict:
+    """What goes in picks.json: every candidate's score, which one we kept and why, and the
+    fingerprint of the request, so a later bible change can tell this pick is out of date."""
     return {
         "shot": result.shot_id,
+        "fingerprint": fingerprint,
         "status": result.status,
         "pick": result.pick.path.name if result.pick else None,
         "candidates": [

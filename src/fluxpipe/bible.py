@@ -74,6 +74,13 @@ class Shot(Strict):
     mood: str = ""
     camera: Camera = Field(default_factory=Camera)
     duration_s: float = 5
+    # A location plate is copied as a camera position, not just a set. Leave it off for shots
+    # framed unlike the plate (close-ups, other angles); the location text still describes the place.
+    plate: bool = True
+    # Every noun in the scene gets drawn: a close-up can describe just what's in its frame.
+    scene: str | None = None  # overrides the location's description
+    lighting: str | None = None  # overrides the location's lighting (e.g. the fire has gone out)
+    face: bool = True  # is his face meant to be in frame? Face QA fails a face where none should be
 
 
 class Baseline(Strict):

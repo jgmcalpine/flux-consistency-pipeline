@@ -11,7 +11,9 @@ import typer
 from .bfl_client import BFLClient, BFLError
 from .bible import load_bible
 from .config import IMAGE_PRICES_USD, load_settings
-from .generate import BASELINE_MODEL, DEFAULT_MODEL, DEFAULT_SIZE, baseline_request, keyframe_request
+from .generate import (
+    BASELINE_MODEL, DEFAULT_MODEL, DEFAULT_SIZE, baseline_request, fingerprint, keyframe_request,
+)
 from .ledger import Ledger, SpendCapExceeded
 from .refs import candidates as ref_candidates
 from .refs import lock as lock_ref
@@ -134,14 +136,14 @@ def generate(
 
 @app.command()
 def baseline(
-    shot: str = typer.Option(None, help="Only this shot id (default: all of them)."),
+    shot: list[str] = typer.Option(None, help="Only these shot ids (repeat --shot). Default: all."),
     model: str = typer.Option(BASELINE_MODEL, help="Keep it the same as the keyframes'."),
 ) -> None:
     """M4: the naive "before" stills. Plain prompts, no references, same model/size/seed as keyframes."""
     settings = load_settings()
     bible = load_bible(settings.bible_dir)
     try:
-        shots = [bible.shot(shot)] if shot else bible.shots
+        shots = [bible.shot(i) for i in shot] if shot else bible.shots
         reqs = [(s, baseline_request(bible, s, model=model)) for s in shots]
     except (ValueError, KeyError) as exc:
         typer.secho(f"  x {exc}", fg="red")
@@ -168,11 +170,11 @@ def baseline(
 
 @app.command()
 def keyframes(
-    shot: str = typer.Option(None, help="Only this shot id (default: all of them)."),
+    shot: list[str] = typer.Option(None, help="Only these shot ids (repeat --shot). Default: all."),
     n: int = typer.Option(3, help="Candidates per round (different seeds)."),
     max_rounds: int = typer.Option(2, help="Rounds per shot if no candidate passes face QA."),
     model: str = typer.Option(BASELINE_MODEL, help="Keep it the same as the baseline's."),
-    redo: bool = typer.Option(False, "--redo", help="Regenerate shots that already have a pick."),
+    redo: bool = typer.Option(False, "--redo", help="Regenerate even if the pick is up to date."),
 ) -> None:
     """M5: N candidates per shot with the locked refs; face QA picks the best; capped retries."""
     from .keyframes import BY_EYE, DRY_RUN, PASS, run_shot, summary
@@ -183,16 +185,22 @@ def keyframes(
     picks_file = picks_dir / "picks.json"
     picks = json.loads(picks_file.read_text()) if picks_file.is_file() else {}
     try:
-        shots = [bible.shot(shot)] if shot else bible.shots
+        shots = [bible.shot(i) for i in shot] if shot else bible.shots
+        reqs = {s.id: keyframe_request(bible, s, model=model) for s in shots}
+        prints = {i: fingerprint(r.endpoint, r.payload, r.refs) for i, r in reqs.items()}
         if not redo:
-            done = [s.id for s in shots if s.id in picks]
+            # A pick is up to date only if it came from exactly today's request (prompt, settings, refs).
+            done = [s.id for s in shots if picks.get(s.id, {}).get("fingerprint") == prints[s.id]]
             if done:
-                typer.secho(f"Skipping {', '.join(done)} (already picked; --redo to regenerate).", dim=True)
-            shots = [s for s in shots if s.id not in picks]
+                typer.secho(f"Up to date, skipping: {', '.join(done)} (--redo to regenerate).", dim=True)
+            stale = [s.id for s in shots if s.id in picks and s.id not in done]
+            if stale:
+                typer.secho(f"Bible changed since the pick, regenerating: {', '.join(stale)}", fg="yellow")
+            shots = [s for s in shots if s.id not in done]
         if not shots:
             typer.echo("Nothing to do.")
             return
-        per_call = {s.id: keyframe_request(bible, s, model=model).est_cost_usd for s in shots}
+        per_call = {s.id: reqs[s.id].est_cost_usd for s in shots}
     except (ValueError, KeyError) as exc:
         typer.secho(f"  x {exc}", fg="red")
         raise typer.Exit(2)
@@ -234,7 +242,8 @@ def keyframes(
 
         try:
             result = run_shot(s.id, n=n, max_rounds=max_rounds, generate=generate,
-                              judge=judge_for(s.character) if detect else None)
+                              judge=judge_for(s.character) if detect else None,
+                              expect_face=s.face)
         except (SpendCapExceeded, BFLError) as exc:
             typer.secho(f"  x {s.id}: {exc}", fg="red")
             raise typer.Exit(1)
@@ -247,7 +256,7 @@ def keyframes(
         typer.secho(f"  {s.id}: {result.status}", fg=colour.get(result.status, "red"), bold=True)
         picks_dir.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(result.pick.path, picks_dir / f"{s.id}.png")
-        picks[s.id] = summary(result)
+        picks[s.id] = summary(result, prints[s.id])
         picks_file.write_text(json.dumps(dict(sorted(picks.items())), indent=2) + "\n")
 
     if not settings.dry_run:

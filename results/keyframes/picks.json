@@ -1,6 +1,7 @@
 {
   "s01": {
     "shot": "s01",
+    "fingerprint": "bcd6cf87a4df17a4",
     "status": "by eye",
     "pick": "s01_flux-2-pro_s661535186.png",
     "candidates": [
@@ -35,6 +36,7 @@
   },
   "s02": {
     "shot": "s02",
+    "fingerprint": "283dacc27bc193a7",
     "status": "pass",
     "pick": "s02_flux-2-pro_s3194447976.png",
     "candidates": [
@@ -69,6 +71,7 @@
   },
   "s03": {
     "shot": "s03",
+    "fingerprint": "2c68922b4ae8d451",
     "status": "by eye",
     "pick": "s03_flux-2-pro_s3378534654.png",
     "candidates": [
@@ -103,6 +106,7 @@
   },
   "s04": {
     "shot": "s04",
+    "fingerprint": "c401d9df1133a8ce",
     "status": "pass",
     "pick": "s04_flux-2-pro_s1459932509.png",
     "candidates": [
@@ -137,6 +141,7 @@
   },
   "s05": {
     "shot": "s05",
+    "fingerprint": "d7652011fa95fde4",
     "status": "by eye",
     "pick": "s05_flux-2-pro_s537132491.png",
     "candidates": [
@@ -171,6 +176,7 @@
   },
   "s06": {
     "shot": "s06",
+    "fingerprint": "efb710e5c4242254",
     "status": "by eye",
     "pick": "s06_flux-2-pro_s3104484465.png",
     "candidates": [
@@ -205,6 +211,7 @@
   },
   "s07": {
     "shot": "s07",
+    "fingerprint": "a30a1b48578de67d",
     "status": "pass",
     "pick": "s07_flux-2-pro_s3456998633.png",
     "candidates": [
@@ -239,6 +246,7 @@
   },
   "s08": {
     "shot": "s08",
+    "fingerprint": "225c4c65b6f91112",
     "status": "pass",
     "pick": "s08_flux-2-pro_s1588756854.png",
     "candidates": [
@@ -273,6 +281,7 @@
   },
   "s09": {
     "shot": "s09",
+    "fingerprint": "dbcb8c249991096d",
     "status": "pass",
     "pick": "s09_flux-2-pro_s699773409.png",
     "candidates": [
@@ -307,6 +316,7 @@
   },
   "s10": {
     "shot": "s10",
+    "fingerprint": "b95551d3aba90369",
     "status": "pass",
     "pick": "s10_flux-2-pro_s1232222214.png",
     "candidates": [
@@ -341,6 +351,7 @@
   },
   "s11": {
     "shot": "s11",
+    "fingerprint": "55d6f84274bddee3",
     "status": "by eye",
     "pick": "s11_flux-2-pro_s1047857299.png",
     "candidates": [
