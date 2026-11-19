@@ -1,0 +1,102 @@
+{
+  "reference": "refs/ismael/face.png",
+  "same_person_threshold": 0.5,
+  "shots": [
+    {
+      "image": "s01.png",
+      "faces": 1,
+      "similarity": 0.565,
+      "height_px": 75,
+      "det_score": 0.712,
+      "verdict": "too small"
+    },
+    {
+      "image": "s02.png",
+      "faces": 1,
+      "similarity": 0.808,
+      "height_px": 171,
+      "det_score": 0.857,
+      "verdict": "same"
+    },
+    {
+      "image": "s03.png",
+      "faces": 0,
+      "similarity": null,
+      "height_px": null,
+      "det_score": null,
+      "verdict": "no face"
+    },
+    {
+      "image": "s04.png",
+      "faces": 1,
+      "similarity": 0.732,
+      "height_px": 150,
+      "det_score": 0.895,
+      "verdict": "same"
+    },
+    {
+      "image": "s05.png",
+      "faces": 0,
+      "similarity": null,
+      "height_px": null,
+      "det_score": null,
+      "verdict": "no face"
+    },
+    {
+      "image": "s06.png",
+      "faces": 0,
+      "similarity": null,
+      "height_px": null,
+      "det_score": null,
+      "verdict": "no face"
+    },
+    {
+      "image": "s07.png",
+      "faces": 1,
+      "similarity": 0.605,
+      "height_px": 85,
+      "det_score": 0.869,
+      "verdict": "same"
+    },
+    {
+      "image": "s08.png",
+      "faces": 1,
+      "similarity": 0.75,
+      "height_px": 259,
+      "det_score": 0.798,
+      "verdict": "same"
+    },
+    {
+      "image": "s09.png",
+      "faces": 0,
+      "similarity": null,
+      "height_px": null,
+      "det_score": null,
+      "verdict": "no face"
+    },
+    {
+      "image": "s10.png",
+      "faces": 0,
+      "similarity": null,
+      "height_px": null,
+      "det_score": null,
+      "verdict": "no face"
+    },
+    {
+      "image": "s11.png",
+      "faces": 1,
+      "similarity": 0.233,
+      "height_px": 49,
+      "det_score": 0.619,
+      "verdict": "too small"
+    }
+  ],
+  "pairwise": [
+    0.753,
+    0.674,
+    0.728,
+    0.512,
+    0.796,
+    0.542
+  ]
+}

@@ -170,13 +170,13 @@ def test_edit_request_sends_the_frame_then_its_extra_images(bible):
     from fluxpipe.config import ROOT
     from fluxpipe.generate import EDIT_KEEP, edit_request
 
-    shot = bible.shot("s11")
+    shot = bible.shot("s11").model_copy(update={
+        "edit": "Put out the fire.", "edit_refs": ["refs/necklace/finished.png"]})
     frame = ROOT / "results" / "keyframes" / "s02.png"  # any committed 1280x720 frame
     extra = [bible.ref_path(r) for r in shot.edit_refs]
     req = edit_request(shot, frame, seed=7, extra=extra)
     p = req.payload
     assert p["prompt"] == f"{shot.edit.strip()} {EDIT_KEEP}"
-    assert "image 2" in p["prompt"]
     assert req.refs == [str(frame), *map(str, extra)]  # the frame is always image 1
     assert "input_image_2" in p and "input_image_3" not in p
     assert (p["width"], p["height"], p["seed"]) == (1280, 720, 7)  # size sent explicitly
@@ -193,5 +193,5 @@ def test_edit_needs_an_edit_in_the_bible(bible):
 
 
 def test_edit_text_never_leaks_into_the_keyframe_prompt(bible):
-    s11 = bible.shot("s11")
-    assert s11.edit and s11.edit.strip()[:30] not in keyframe_request(bible, s11, model="flux-2-pro").payload["prompt"]
+    s11 = bible.shot("s11").model_copy(update={"edit": "Put out the fire in the fire pit."})
+    assert s11.edit not in keyframe_request(bible, s11, model="flux-2-pro").payload["prompt"]

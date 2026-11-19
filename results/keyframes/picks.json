@@ -386,6 +386,19 @@
       }
     ],
     "picked_by": "eye",
-    "note": "only candidate whose pendant matches ours; the other two drew a different necklace"
+    "note": "unedited: both pendant-swap edits failed (one huge cage, one round medallion); the bar pendant is small and reads fine in a wide shot",
+    "source": "s11_flux-2-pro_s1047857300.png",
+    "edits": [
+      {
+        "seed": 1047858299,
+        "image": "s11_edit_s1047858299.png",
+        "edit_of": "s11_flux-2-pro_s1047857300.png"
+      },
+      {
+        "seed": 1047858300,
+        "image": "s11_edit_s1047858300.png",
+        "edit_of": "s11_flux-2-pro_s1047857300.png"
+      }
+    ]
   }
 }
