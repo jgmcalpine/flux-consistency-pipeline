@@ -108,6 +108,24 @@ def keyframe_request(
     )
 
 
+EDIT_KEEP = "Keep everything else exactly as it is in image 1."
+
+
+def edit_request(
+    shot: Shot, source: Path, *, seed: int, model: str = "flux-2-pro",
+    width: int = DEFAULT_SIZE[0], height: int = DEFAULT_SIZE[1],
+) -> Request:
+    """Edit a finished keyframe: the frame is image 1, the prompt says only what changes.
+
+    Same endpoint as generation; passing input_image is what makes it an edit (docs.bfl.ai, FLUX.2
+    image editing). Size is sent explicitly: the docs don't say what an edit returns without it.
+    """
+    if not shot.edit:
+        raise ValueError(f"{shot.id} has no `edit` in shots.yaml")
+    prompt = f"{shot.edit.strip()} {EDIT_KEEP}"
+    return build_request(model, prompt, width=width, height=height, seed=seed, ref_files=[source])
+
+
 BASELINE_MODEL = "flux-2-pro"  # same model as the keyframes, or the comparison isn't fair
 
 

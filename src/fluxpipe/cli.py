@@ -1,4 +1,4 @@
-"""Command line: fluxpipe validate | prompts | diff | generate | baseline | keyframes | pick | score | refs | lock | credits | budget"""
+"""Command line: fluxpipe validate | prompts | diff | generate | baseline | keyframes | edit | pick | score | refs | lock | credits | budget"""
 
 from __future__ import annotations
 
@@ -12,7 +12,8 @@ from .bfl_client import BFLClient, BFLError
 from .bible import load_bible
 from .config import IMAGE_PRICES_USD, load_settings
 from .generate import (
-    BASELINE_MODEL, DEFAULT_MODEL, DEFAULT_SIZE, baseline_request, fingerprint, keyframe_request,
+    BASELINE_MODEL, DEFAULT_MODEL, DEFAULT_SIZE, baseline_request, edit_request, fingerprint,
+    keyframe_request, shot_seed,
 )
 from .ledger import Ledger, SpendCapExceeded
 from .refs import candidates as ref_candidates
@@ -265,6 +266,64 @@ def keyframes(
 
 
 @app.command()
+def edit(
+    shot: str = typer.Argument(..., help="Shot id with an `edit` in shots.yaml, e.g. s11"),
+    n: int = typer.Option(2, help="How many edit candidates (different seeds)."),
+) -> None:
+    """Apply the shot's `edit` to its current pick (FLUX.2 editing). Choose one with `fluxpipe pick`."""
+    settings = load_settings()
+    bible = load_bible(settings.bible_dir)
+    picks_dir = settings.assets_dir.parent / "results" / "keyframes"
+    picks_file = picks_dir / "picks.json"
+    picks = json.loads(picks_file.read_text()) if picks_file.is_file() else {}
+    try:
+        s = bible.shot(shot)
+        entry = picks[shot]
+    except KeyError as exc:
+        typer.secho(f"  x {exc} (no shot, or no keyframe pick yet: run `fluxpipe keyframes` first)", fg="red")
+        raise typer.Exit(2)
+    current = keyframe_request(bible, s, model=BASELINE_MODEL)
+    if entry.get("fingerprint") != fingerprint(current.endpoint, current.payload, current.refs):
+        typer.secho(f"  x {shot}'s keyframe is out of date with the bible: run `fluxpipe keyframes` first",
+                    fg="red")
+        raise typer.Exit(2)
+    # Always edit the generated keyframe, never an earlier edit: edits don't stack up drift.
+    generated = [c["image"] for c in entry["candidates"]]
+    base = entry["pick"] if entry["pick"] in generated else entry["source"]
+    source = settings.assets_dir / "keyframes" / shot / base
+    seeds = [(shot_seed(shot) + 1000 + i) % 2**32 for i in range(n)]
+    try:
+        reqs = [edit_request(s, source, seed=seed) for seed in seeds]
+    except ValueError as exc:
+        typer.secho(f"  x {exc}", fg="red")
+        raise typer.Exit(2)
+    typer.echo(f"{n} edit(s) of {source.name}: ~${sum(r.est_cost_usd for r in reqs):.3f}")
+    typer.secho(f"  prompt: {reqs[0].payload['prompt']}", dim=True)
+
+    client = BFLClient(settings.api_key, Ledger(settings.ledger_path, settings.spend_cap_usd),
+                       dry_run=settings.dry_run)
+    made = []
+    for seed, req in zip(seeds, reqs):
+        out = settings.assets_dir / "keyframes" / shot / f"{shot}_edit_s{seed}.png"
+        try:
+            res = client.run_job(endpoint=req.endpoint, payload=req.payload, est_cost_usd=req.est_cost_usd,
+                                 stage="edit", out_path=out, shot_id=shot, refs=req.refs)
+        except (SpendCapExceeded, BFLError) as exc:
+            typer.secho(f"  x {exc}", fg="red")
+            raise typer.Exit(1)
+        if res.dry_run:
+            typer.secho(f"  (dry run, ledger row {res.ledger_id}) seed {seed}  ~${req.est_cost_usd:.3f}", dim=True)
+            continue
+        made.append({"seed": seed, "image": out.name, "edit_of": source.name})
+        typer.echo(f"  {out.relative_to(settings.assets_dir.parent)}")
+    if made:
+        entry["source"] = source.name
+        entry["edits"] = [e for e in entry.get("edits", []) if e["image"] not in {m["image"] for m in made}] + made
+        picks_file.write_text(json.dumps(dict(sorted(picks.items())), indent=2) + "\n")
+        typer.echo(f"Look at them, then: fluxpipe pick {shot} <file>")
+
+
+@app.command()
 def pick(
     shot: str = typer.Argument(..., help="Shot id, e.g. s09"),
     image: str = typer.Argument(..., help="A candidate file name from picks.json, e.g. s09_flux-2-pro_s699773409.png"),
@@ -276,7 +335,8 @@ def pick(
     picks_file = picks_dir / "picks.json"
     picks = json.loads(picks_file.read_text()) if picks_file.is_file() else {}
     entry = picks.get(shot)
-    if entry is None or image not in [c["image"] for c in entry["candidates"]]:
+    choices = [] if entry is None else [c["image"] for c in entry["candidates"] + entry.get("edits", [])]
+    if image not in choices:
         typer.secho(f"  x {image} is not a candidate for {shot} in picks.json", fg="red")
         raise typer.Exit(2)
     shutil.copyfile(settings.assets_dir / "keyframes" / shot / image, picks_dir / f"{shot}.png")

@@ -81,6 +81,9 @@ class Shot(Strict):
     scene: str | None = None  # overrides the location's description
     lighting: str | None = None  # overrides the location's lighting (e.g. the fire has gone out)
     face: bool = True  # is his face meant to be in frame? Face QA fails a face where none should be
+    # A fix applied to the picked keyframe with FLUX.2 editing (`fluxpipe edit`), for what a reference
+    # won't let the words change (s11: the plate's fire stays lit). Describe only the change.
+    edit: str | None = None
 
 
 class Baseline(Strict):

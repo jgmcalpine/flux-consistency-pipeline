@@ -164,3 +164,30 @@ def test_fingerprint_ignores_seed_but_not_prompt_or_refs(bible, tmp_path):
     relocked = tmp_path / "face.png"
     relocked.write_bytes(b"a different image")
     assert fingerprint(a.endpoint, a.payload, [relocked, *a.refs[1:]]) != fingerprint(a.endpoint, a.payload, a.refs)
+
+
+def test_edit_request_sends_only_the_frame_and_the_change(bible):
+    from fluxpipe.config import ROOT
+    from fluxpipe.generate import EDIT_KEEP, edit_request
+
+    frame = ROOT / "results" / "keyframes" / "s02.png"  # any committed 1280x720 frame
+    req = edit_request(bible.shot("s11"), frame, seed=7)
+    p = req.payload
+    assert p["prompt"].startswith("The fire in the fire pit has burnt out") and p["prompt"].endswith(EDIT_KEEP)
+    assert "input_image" in p and "input_image_2" not in p  # the frame is image 1, nothing else
+    assert (p["width"], p["height"], p["seed"]) == (1280, 720, 7)  # size sent explicitly
+    assert req.est_cost_usd > 0.03  # output plus one input image
+
+
+def test_edit_needs_an_edit_in_the_bible(bible):
+    import pytest
+    from fluxpipe.config import ROOT
+    from fluxpipe.generate import edit_request
+
+    with pytest.raises(ValueError, match="no `edit`"):
+        edit_request(bible.shot("s10"), ROOT / "results" / "keyframes" / "s02.png", seed=1)
+
+
+def test_edit_text_never_leaks_into_the_keyframe_prompt(bible):
+    s11 = bible.shot("s11")
+    assert s11.edit and s11.edit.strip()[:30] not in keyframe_request(bible, s11, model="flux-2-pro").payload["prompt"]

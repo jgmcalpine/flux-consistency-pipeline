@@ -178,4 +178,10 @@ shots:
     mood: peaceful, complete
     lighting: >-
       cold blue moonlight only; the fire pit is dark, burnt out to grey ash with a thin wisp of smoke
+    # The plate shows a burning fire and wins over the lighting text (round 2), so the fire is put
+    # out afterwards by editing the picked frame: `fluxpipe edit s11`.
+    edit: >-
+      The fire in the fire pit has burnt out: the fire pit holds only cold grey ash and a thin wisp
+      of smoke. The hut is lit only by cold blue moonlight, the warm firelight gone from the man,
+      the hammock and the worktable.
     duration_s: 5
