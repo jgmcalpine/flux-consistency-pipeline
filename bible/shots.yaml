@@ -33,6 +33,9 @@ shots:
     position: crouched at the water's edge, left of centre, the satchel on the bank behind him
     action: he sifts gravel in a shallow metal pan, rinsing it slowly in the river
     mood: patient, absorbed
+    motion: >-
+      he keeps sifting, swirling the gravel in the shallow pan and rinsing it slowly in the river,
+      water running over the rim; the camera holds still
     duration_s: 5
 
   - id: s02
@@ -44,6 +47,9 @@ shots:
     position: centre frame, facing the camera, the pan in his hands
     action: he stops sifting and goes completely still, leaning closer to the pan
     mood: sudden focus
+    motion: >-
+      his smile fades as he looks down into the pan and goes completely still, then leans slowly
+      closer to it; the camera pushes in slowly
     duration_s: 5
 
   - id: s03
@@ -59,6 +65,9 @@ shots:
       water running off it
     mood: discovery
     face: false
+    motion: >-
+      his thumb and forefinger lift the small green crystal slowly out of the wet gravel, grains of
+      sand and water dripping off it; the camera holds still
     duration_s: 5
 
   - id: s04
@@ -73,6 +82,9 @@ shots:
       he smiles, slips the small crystal held between his thumb and forefinger into the satchel and
       lifts its strap onto his shoulder
     mood: quiet joy
+    motion: >-
+      he smiles down at the crystal in his hand, then slips it into the satchel at his hip and pats
+      the flap closed; the camera holds still
     duration_s: 5
 
   # --- Jungle path, golden hour into dusk ---
@@ -86,6 +98,9 @@ shots:
     position: walking up the path away from the camera, lower third of the frame, satchel on his shoulder
     action: he climbs the winding path toward his hut at an easy pace
     mood: content, unhurried
+    motion: >-
+      he walks steadily up the winding path away from the camera toward the hut on the ridge, mist
+      drifting slowly in the valley; the camera holds still
     duration_s: 5
 
   - id: s06
@@ -100,6 +115,9 @@ shots:
     mood: homecoming
     plate: false  # the plate's hut is far away at the top of the path; here we are beside it
     lighting: dusk, the last blue light of the day, warm firelight glowing inside the hut
+    motion: >-
+      he walks from left to right up to the hut and stops beside its open side, firelight flickering
+      inside; the camera holds still
     duration_s: 5
 
   # --- Inside the hut, night. The fire burns in s07-s10 and is out in s11. ---
@@ -114,6 +132,9 @@ shots:
       he drops the satchel on the floor and sits down at the worktable, the fire burning brightly
       in the fire pit beside him
     mood: eager
+    motion: >-
+      sitting at the worktable, he leans forward and sorts through the copper wire with both hands,
+      the fire flickering beside him; the camera holds still
     duration_s: 5
 
   - id: s08
@@ -128,6 +149,9 @@ shots:
       he holds the small crystal up to the firelight between his thumb and forefinger and turns it
       slowly, smiling, the fire burning behind him
     mood: delight
+    motion: >-
+      he turns the small crystal slowly between his thumb and forefinger, the firelight glinting
+      through it, smiling; the fire flickers behind him; the camera pushes in slowly
     duration_s: 5
 
   - id: s09
@@ -144,6 +168,9 @@ shots:
     scene: the dark wooden top of the small worktable in his hut, copper wire, beads and small hand tools on it
     lighting: warm amber firelight from the fire burning just out of frame
     face: false
+    motion: >-
+      his hands lift the cloth away and lay it aside, leaving the necklace on the table with its
+      copper cage empty; firelight flickers across the table; the camera holds still
     duration_s: 5
 
   - id: s10
@@ -162,6 +189,9 @@ shots:
     scene: the dark wooden top of the small worktable in his hut, copper wire, beads and small hand tools on it
     lighting: warm amber firelight from the fire burning just out of frame
     face: false
+    motion: >-
+      his fingertips press the copper prongs gently closed around the small crystal, then he lets
+      the finished pendant hang from its cord; the camera holds still
     duration_s: 5
 
   - id: s11
@@ -184,4 +214,7 @@ shots:
     # Swapping in the finished pendant from s10 (bible/refs/necklace/finished.png) was tried twice and
     # rejected: a crop from a close-up carries close-up scale (a huge cage, or a wrong medallion). The
     # keyframe's small bar pendant reads fine in a wide shot. `fluxpipe edit` stays for future shots.
+    motion: >-
+      he sleeps, breathing slowly, the hammock swaying gently; a thin wisp of smoke rises from the
+      cold fire pit; the camera holds still
     duration_s: 5

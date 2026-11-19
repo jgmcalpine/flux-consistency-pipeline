@@ -39,10 +39,15 @@ IMAGE_PRICES_USD: dict[str, ImagePrice] = {
     "flux-2-max": ImagePrice(0.07, 0.03, 0.03, max_refs=8),
 }
 
-# USD per second of output video. Unverified; check at M6.
+# FLUX 3 video, USD per second of output (bfl.ai/pricing?category=flux+3+video, 19 Nov 2026).
+# Image->video. A draft is hd only. Draft-enhance is "priced as a regular generation" at the
+# resolution it renders. Partial seconds round UP. Audio is free (we turn it off anyway).
 VIDEO_PRICES_USD_PER_S: dict[str, float] = {
     "flux-3-video-draft": 0.06,
-    "flux-3-video-hd": 0.17,
+    "flux-3-video-hd": 0.15,   # 1280x704 at 16:9, generated natively
+    "flux-3-video-fhd": 0.24,  # the others are upsampled from hd
+    "flux-3-video-qhd": 0.28,
+    "flux-3-video-uhd": 0.41,
 }
 
 MAX_MP = 4  # FLUX.2's maximum output (and single-reference) resolution
@@ -95,7 +100,7 @@ def estimate_cost(
     if model in VIDEO_PRICES_USD_PER_S:
         if seconds is None:
             raise ValueError(f"{model} is a video model: pass seconds=")
-        return round(VIDEO_PRICES_USD_PER_S[model] * seconds, 4)
+        return round(VIDEO_PRICES_USD_PER_S[model] * math.ceil(seconds), 4)
 
     price = IMAGE_PRICES_USD[model]
     if not (width and height):

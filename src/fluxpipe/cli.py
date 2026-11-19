@@ -1,4 +1,4 @@
-"""Command line: fluxpipe validate | prompts | diff | generate | baseline | keyframes | edit | pick | score | refs | lock | credits | budget"""
+"""Command line: fluxpipe validate | prompts | diff | generate | baseline | keyframes | edit | pick | video | score-clip | score | refs | lock | credits | budget"""
 
 from __future__ import annotations
 
@@ -345,6 +345,140 @@ def pick(
     entry.update(pick=image, picked_by="eye", note=note)
     picks_file.write_text(json.dumps(dict(sorted(picks.items())), indent=2) + "\n")
     typer.secho(f"{shot}: picked {image} by eye", fg="green")
+
+
+VIDEO_POLL_TIMEOUT_S = 1800  # video jobs take minutes, not seconds
+
+
+@app.command()
+def video(
+    shot: str = typer.Argument(..., help="Shot id, e.g. s02"),
+    takes: int = typer.Option(1, help="How many draft takes to make (each a fresh roll; no seeds)."),
+    enhance: str = typer.Option(None, help="A draft (file name or path) to render at full quality."),
+    resolution: str = typer.Option("hd", help="For --enhance: hd (native, $0.15/s) or fhd/qhd/uhd (upsampled)."),
+) -> None:
+    """M6: animate a shot's picked keyframe. Drafts first ($0.06/s); then --enhance the keeper."""
+    from .video import draft_request, enhance_request, find_draft_cache, fit_start_frame
+
+    settings = load_settings()
+    bible = load_bible(settings.bible_dir)
+    root = settings.assets_dir.parent
+    keyframe = root / "results" / "keyframes" / f"{shot}.png"
+    work = settings.assets_dir / "video" / shot
+    clips_dir = root / "results" / "video"
+    manifest_file = clips_dir / "clips.json"
+    manifest = json.loads(manifest_file.read_text()) if manifest_file.is_file() else {}
+    try:
+        s = bible.shot(shot)
+    except KeyError as exc:
+        typer.secho(f"  x {exc}", fg="red")
+        raise typer.Exit(2)
+    if not keyframe.is_file():
+        typer.secho(f"  x no keyframe pick for {shot}: run `fluxpipe keyframes` first", fg="red")
+        raise typer.Exit(2)
+
+    client = BFLClient(settings.api_key, Ledger(settings.ledger_path, settings.spend_cap_usd),
+                       dry_run=settings.dry_run)
+    entry = manifest.setdefault(shot, {"keyframe": keyframe.name, "takes": [], "final": None})
+
+    if enhance:
+        name = Path(enhance).name
+        cache = work / name.replace(".mp4", ".cache.bin")
+        if not cache.is_file():
+            typer.secho(f"  x no draft_cache saved for {name} (looked for {cache.name})", fg="red")
+            raise typer.Exit(2)
+        req = enhance_request(s, cache, resolution=resolution)
+        out = work / f"{shot}_final_{resolution}.mp4"
+        typer.echo(f"{shot}: enhance {name} at {resolution}: ~${req.est_cost_usd:.2f}")
+        try:
+            res = client.run_job(endpoint=req.endpoint, payload=req.payload, est_cost_usd=req.est_cost_usd,
+                                 stage="video", out_path=out, shot_id=shot, refs=req.refs,
+                                 poll_timeout_s=VIDEO_POLL_TIMEOUT_S)
+        except (SpendCapExceeded, BFLError) as exc:
+            typer.secho(f"  x {exc}", fg="red")
+            raise typer.Exit(1)
+        if res.dry_run:
+            typer.secho(f"  (dry run, ledger row {res.ledger_id})", dim=True)
+            return
+        clips_dir.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(out, clips_dir / f"{shot}.mp4")
+        entry["final"] = {"from": name, "resolution": resolution, "file": out.name,
+                          "cost_usd": res.actual_cost_usd}
+        manifest_file.write_text(json.dumps(dict(sorted(manifest.items())), indent=2) + "\n")
+        typer.secho(f"  saved {out.relative_to(root)} -> results/video/{shot}.mp4", fg="green")
+        typer.echo(f"  cost: estimated ${req.est_cost_usd:.2f}, BFL reported "
+                   f"{'$%.2f' % res.actual_cost_usd if res.actual_cost_usd is not None else 'not reported'}")
+        return
+
+    start = fit_start_frame(keyframe, work / "start.png")
+    first = len(list(work.glob(f"{shot}_draft*.mp4"))) + 1
+    reqs = [draft_request(s, start) for _ in range(takes)]
+    typer.echo(f"{shot}: {takes} draft take(s), {reqs[0].payload['duration']} s hd: "
+               f"~${sum(r.est_cost_usd for r in reqs):.2f}")
+    typer.secho(f"  motion: {reqs[0].payload['prompt']}", dim=True)
+    for i, req in enumerate(reqs):
+        out = work / f"{shot}_draft{first + i}.mp4"
+        try:
+            res = client.run_job(endpoint=req.endpoint, payload=req.payload, est_cost_usd=req.est_cost_usd,
+                                 stage="video", out_path=out, shot_id=shot, refs=req.refs,
+                                 poll_timeout_s=VIDEO_POLL_TIMEOUT_S)
+        except (SpendCapExceeded, BFLError) as exc:
+            typer.secho(f"  x {exc}", fg="red")
+            raise typer.Exit(1)
+        if res.dry_run:
+            typer.secho(f"  (dry run, ledger row {res.ledger_id}) {out.name}  ~${req.est_cost_usd:.2f}", dim=True)
+            continue
+        # Keep the whole poll response: what a draft returns is only partly documented.
+        out.with_suffix(".json").write_text(json.dumps(res.poll, indent=2) + "\n")
+        cache_url = find_draft_cache(res.poll or {})
+        cache = None
+        if cache_url:  # download now: result URLs expire after about 2 hours
+            cache = client.fetch(cache_url, out.with_suffix(".cache.bin"))
+        else:
+            typer.secho(f"  ! no draft_cache in the response (see {out.with_suffix('.json').name});"
+                        " this take can't be enhanced", fg="yellow")
+        entry["takes"].append({"file": out.name, "cost_usd": res.actual_cost_usd,
+                               "draft_cache": cache.name if cache else None})
+        manifest_file.parent.mkdir(parents=True, exist_ok=True)
+        manifest_file.write_text(json.dumps(dict(sorted(manifest.items())), indent=2) + "\n")
+        cost = f"${res.actual_cost_usd:.2f}" if res.actual_cost_usd is not None else "not reported"
+        typer.secho(f"  saved {out.relative_to(root)}  (estimated ${req.est_cost_usd:.2f}, BFL reported {cost})",
+                    fg="green")
+    if not settings.dry_run:
+        typer.echo(f"Watch them, then: fluxpipe score-clip <file>  and  fluxpipe video {shot} --enhance <file>")
+
+
+@app.command("score-clip")
+def score_clip(
+    clip: Path = typer.Argument(..., help="An mp4, e.g. assets/video/s02/s02_draft1.mp4"),
+    character: str = typer.Option("ismael", help="Whose locked face to compare against."),
+    fps: float = typer.Option(2.0, help="Frames sampled per second."),
+) -> None:
+    """Video QA: face identity in frames sampled across a clip (first, mean, min, drift). Free."""
+    from .qa.face import insightface_detector, score_images
+    from .qa.video import extract_frames, summarize
+
+    settings = load_settings()
+    bible = load_bible(settings.bible_dir)
+    char = bible.characters.get(character)
+    if char is None or not char.reference_images or not clip.is_file():
+        typer.secho(f"  x need an existing clip and a locked face for '{character}'", fg="red")
+        raise typer.Exit(2)
+    frames = extract_frames(clip, clip.parent / f"frames_{clip.stem}", fps=fps)
+    typer.echo(f"{clip.name}: {len(frames)} frames at {fps:g}/s. Loading InsightFace...")
+    scores, _ = score_images(insightface_detector(), bible.ref_path(char.reference_images[0]), frames)
+    for i, sc in enumerate(scores):
+        sim = f"{sc.similarity:.3f}" if sc.similarity is not None else "  -  "
+        typer.echo(f"  t={i / fps:4.1f}s  {sim}  {sc.verdict}")
+    summary = summarize(scores)
+    if summary["judged"]:
+        typer.secho(f"first {summary['first']:.3f}, mean {summary['mean']:.3f}, min {summary['min']:.3f},"
+                    f" drift {summary['drift']:.3f} over {summary['judged']} judged frame(s)", bold=True)
+    else:
+        typer.echo("No judgeable face in any frame (wide shot or hands only): judge this clip by eye.")
+    out = clip.with_suffix(".faces.json")
+    out.write_text(json.dumps({"summary": summary, "frames": [x.as_dict() for x in scores]}, indent=2) + "\n")
+    typer.secho(f"  wrote {out}", dim=True)
 
 
 @app.command()

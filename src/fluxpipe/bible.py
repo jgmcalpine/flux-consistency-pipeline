@@ -86,6 +86,9 @@ class Shot(Strict):
     edit: str | None = None
     # Extra images for the edit, attached after the frame (image 2, 3...). Paths relative to the bible.
     edit_refs: list[str] = Field(default_factory=list)
+    # M6, image-to-video: only what MOVES from the picked keyframe on, and what the camera does.
+    # The start frame already sets the look; re-describing it invites the model to redraw it.
+    motion: str | None = None
 
 
 class Baseline(Strict):

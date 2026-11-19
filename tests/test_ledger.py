@@ -30,6 +30,8 @@ def test_dry_runs_are_logged_but_free(tmp_path):
 
 
 def test_video_cost_is_per_second():
-    assert estimate_cost("flux-3-video-hd", seconds=5) == 0.85
+    assert estimate_cost("flux-3-video-hd", seconds=5) == 0.75
+    assert estimate_cost("flux-3-video-draft", seconds=5) == 0.30
+    assert estimate_cost("flux-3-video-draft", seconds=4.2) == 0.30  # partial seconds round up
     with pytest.raises(KeyError):
         estimate_cost("some-unpriced-model")
