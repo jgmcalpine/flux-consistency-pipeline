@@ -74,13 +74,15 @@ shots:
     character: ismael
     costume: beachwear
     location: riverbank
-    props: [crystal, satchel]
-    framing: medium close-up, head and shoulders
+    # No crystal ref here: its product shot (crystal filling the frame) made it fist-sized in a
+    # medium shot, twice, whatever the words said. Too small here to need its exact facets.
+    props: [satchel]
+    framing: medium shot from the waist up, his hands and the satchel in frame
     camera: { lens: 85mm }
     position: centre frame, three-quarter view facing right
     action: >-
-      he smiles, slips the small crystal held between his thumb and forefinger into the satchel and
-      lifts its strap onto his shoulder
+      he smiles down at a tiny green crystal, no bigger than his thumbnail, pinched between the tips
+      of his thumb and forefinger just above the open satchel at his hip
     mood: quiet joy
     motion: >-
       he smiles down at the crystal in his hand, then slips it into the satchel at his hip and pats
