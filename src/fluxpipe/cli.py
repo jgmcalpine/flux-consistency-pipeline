@@ -1,4 +1,4 @@
-"""Command line: fluxpipe validate | prompts | diff | generate | baseline | keyframes | edit | pick | video | score-clip | qa | demo | cut | score | refs | lock | credits | budget"""
+"""Command line: fluxpipe validate | prompts | diff | generate | baseline | keyframes | edit | pick | video | score-clip | qa | demo | cut | report | score | refs | lock | credits | budget"""
 
 from __future__ import annotations
 
@@ -565,6 +565,81 @@ def cut(
                      subtitle="a rough cut" if finals < len(shots) else "", end_lines=end_lines)
     typer.secho(f"  wrote {out.relative_to(root) if out.is_relative_to(root) else out}"
                 f"  ({info['story_s']:.1f} s of story; parts in assets/cut/)", fg="green")
+
+
+@app.command()
+def report() -> None:
+    """README evidence: the cost table from the ledger, figures from the results, web-size videos. Free."""
+    from .demo import load_scores
+    from .report import (cost_markdown, cost_rows, fill_markers, headline_markdown, film_strip, frame_at,
+                         refs_figure, stills_figure, web_video_cmd)
+    import subprocess
+
+    settings = load_settings()
+    bible = load_bible(settings.bible_dir)
+    root = settings.assets_dir.parent
+    results = root / "results"
+    out = results / "readme"
+    out.mkdir(parents=True, exist_ok=True)
+    work = settings.assets_dir / "report"
+    work.mkdir(parents=True, exist_ok=True)
+
+    ledger = Ledger(settings.ledger_path, settings.spend_cap_usd)
+    calls = [dict(r) for r in ledger.db.execute(
+        "SELECT stage, model, est_cost_usd, actual_cost_usd FROM generations WHERE status IN ('done', 'failed')")]
+    rows = cost_rows(calls)
+    costs = cost_markdown(rows)
+    (results / "costs.md").write_text(costs)
+    typer.echo(f"  results/costs.md: {len(calls)} paid calls")
+    readme = root / "README.md"
+    qa_md = results / "video" / "qa.md"
+    if readme.is_file() and qa_md.is_file():
+        from .demo import headline
+        base_f = json.loads((results / "baseline" / "faces.json").read_text())
+        pipe_f = json.loads((results / "keyframes" / "faces.json").read_text())
+        base_s, pipe_s = load_scores(results / "baseline" / "faces.json"), load_scores(results / "keyframes" / "faces.json")
+        head = headline(DEMO_SHOTS, base_s, pipe_s)
+        qa_totals = json.loads((results / "video" / "qa.json").read_text())["totals"]
+        top = headline_markdown(base_f["pairwise"], pipe_f["pairwise"], sum(s.judged for s in base_s.values()),
+                                sum(s.judged for s in pipe_s.values()), head, qa_totals, rows)
+        readme.write_text(fill_markers(readme.read_text(),
+                                       {"headline": top, "costs": costs, "qa": qa_md.read_text()}))
+        typer.echo("  README.md: cost and QA tables refreshed")
+
+    shots = [s.id for s in bible.shots]
+    baseline = {s: sorted((results / "baseline").glob(f"{s}_*.png"))[0] for s in shots}
+    pipeline = {s: results / "keyframes" / f"{s}.png" for s in shots}
+    stills_figure(shots, baseline, pipeline, load_scores(results / "baseline" / "faces.json"),
+                  load_scores(results / "keyframes" / "faces.json")).save(out / "stills.jpg", quality=88)
+
+    char = bible.characters["ismael"]
+    refs = [("face", char.reference_images[0]), *(("costume sheet", r) for r in char.costume_references["beachwear"])]
+    refs += [(f"place: {l.id}", l.reference_images[0]) for l in bible.locations.values() if l.reference_images]
+    refs += [(f"prop: {p.id}", p.reference_images[0]) for p in bible.props.values() if p.reference_images]
+    refs_figure([(label, bible.ref_path(r)) for label, r in refs]).save(out / "refs.jpg", quality=88)
+
+    demo_mp4, film_mp4 = results / "demo.mp4", results / "film.mp4"
+    if demo_mp4.is_file():  # the s04 side-by-side: 4 s intro + s02's 5 s, then halfway into s04
+        from PIL import Image
+        Image.open(frame_at(demo_mp4, 11.5, work / "hero.png")).resize((1280, 720), Image.LANCZOS).save(out / "hero.jpg", quality=90)
+    qa_file = results / "video" / "qa.json"
+    if film_mp4.is_file() and qa_file.is_file():
+        t, frames = 3.0, []  # after the 3 s title card
+        for r in json.loads(qa_file.read_text())["shots"]:
+            frames.append((r["shot"], frame_at(film_mp4, t + r["seconds"] / 2, work / f"film_{r['shot']}.png")))
+            t += r["seconds"]
+        film_strip(frames).save(out / "film.jpg", quality=88)
+    for name in ("hero", "film", "stills", "refs"):
+        if (out / f"{name}.jpg").is_file():
+            typer.echo(f"  results/readme/{name}.jpg ({(out / f'{name}.jpg').stat().st_size / 1e3:.0f} kB)")
+
+    web = settings.assets_dir / "web"
+    web.mkdir(parents=True, exist_ok=True)
+    for src, width, crf in ((demo_mp4, 1280, 23), (film_mp4, 960, 27)):  # the demo's text must stay sharp
+        if src.is_file():
+            subprocess.run(web_video_cmd(src, web / src.name, width, crf), check=True)
+            mb = (web / src.name).stat().st_size / 1e6
+            typer.echo(f"  assets/web/{src.name}: {mb:.1f} MB (drag into the README on github.com to play inline)")
 
 
 @app.command("score-clip")
