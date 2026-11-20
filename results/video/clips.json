@@ -1,4 +1,16 @@
 {
+  "s01": {
+    "keyframe": "s01.png",
+    "takes": [
+      {
+        "file": "s01_draft1.mp4",
+        "from_pick": "s01_flux-2-pro_s661535187.png",
+        "cost_usd": 0.3,
+        "draft_cache": "s01_draft1.cache.bin"
+      }
+    ],
+    "final": null
+  },
   "s02": {
     "keyframe": "s02.png",
     "takes": [
@@ -22,6 +34,18 @@
       "file": "s02_final_hd.mp4",
       "cost_usd": 0.75
     }
+  },
+  "s03": {
+    "keyframe": "s03.png",
+    "takes": [
+      {
+        "file": "s03_draft1.mp4",
+        "from_pick": "s03_flux-2-pro_s3378534654.png",
+        "cost_usd": 0.3,
+        "draft_cache": "s03_draft1.cache.bin"
+      }
+    ],
+    "final": null
   },
   "s04": {
     "keyframe": "s04.png",
@@ -47,6 +71,30 @@
       "cost_usd": 0.75
     }
   },
+  "s05": {
+    "keyframe": "s05.png",
+    "takes": [
+      {
+        "file": "s05_draft1.mp4",
+        "from_pick": "s05_flux-2-pro_s537132492.png",
+        "cost_usd": 0.3,
+        "draft_cache": "s05_draft1.cache.bin"
+      }
+    ],
+    "final": null
+  },
+  "s06": {
+    "keyframe": "s06.png",
+    "takes": [
+      {
+        "file": "s06_draft1.mp4",
+        "from_pick": "s06_flux-2-pro_s3104484465.png",
+        "cost_usd": 0.3,
+        "draft_cache": "s06_draft1.cache.bin"
+      }
+    ],
+    "final": null
+  },
   "s07": {
     "keyframe": "s07.png",
     "takes": [
@@ -55,6 +103,12 @@
         "cost_usd": 0.3,
         "draft_cache": "s07_draft1.cache.bin",
         "from_pick": "s07_flux-2-pro_s3456998633.png"
+      },
+      {
+        "file": "s07_draft2.mp4",
+        "from_pick": "s07_flux-2-pro_s3456998631.png",
+        "cost_usd": 0.3,
+        "draft_cache": "s07_draft2.cache.bin"
       }
     ],
     "final": null
@@ -76,5 +130,41 @@
       "file": "s08_final_hd.mp4",
       "cost_usd": 0.75
     }
+  },
+  "s09": {
+    "keyframe": "s09.png",
+    "takes": [
+      {
+        "file": "s09_draft1.mp4",
+        "from_pick": "s09_flux-2-pro_s699773410.png",
+        "cost_usd": 0.3,
+        "draft_cache": "s09_draft1.cache.bin"
+      }
+    ],
+    "final": null
+  },
+  "s10": {
+    "keyframe": "s10.png",
+    "takes": [
+      {
+        "file": "s10_draft1.mp4",
+        "from_pick": "s10_flux-2-pro_s1232222215.png",
+        "cost_usd": 0.3,
+        "draft_cache": "s10_draft1.cache.bin"
+      }
+    ],
+    "final": null
+  },
+  "s11": {
+    "keyframe": "s11.png",
+    "takes": [
+      {
+        "file": "s11_draft1.mp4",
+        "from_pick": "s11_flux-2-pro_s1047857300.png",
+        "cost_usd": 0.3,
+        "draft_cache": "s11_draft1.cache.bin"
+      }
+    ],
+    "final": null
   }
 }

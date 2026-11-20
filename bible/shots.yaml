@@ -176,6 +176,9 @@ shots:
       his hands draw the small green cloth up off the necklace's cord and lay it aside on the table;
       the empty copper cage settles on the table; firelight flickers across it; the camera holds still
     duration_s: 5
+    # Draft 1 is good to ~2.6 s (cloth off, the cage shown empty); then the cage, told to "settle",
+    # collapses into a tangle and the cord vanishes. Video models don't know an object is rigid.
+    cut_to: 2.6
 
   - id: s10
     character: ismael

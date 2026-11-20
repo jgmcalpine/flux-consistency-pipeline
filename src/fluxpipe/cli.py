@@ -544,6 +544,8 @@ def cut(
         for p in problems:
             typer.secho(f"  x {p}", fg="red")
         raise typer.Exit(2)
+    for s in shots:
+        s.cut_to = bible.shot(s.id).cut_to
 
     finals = sum(s.kind == "final" for s in shots)
     spend = Ledger(settings.ledger_path, settings.spend_cap_usd).total_spent()
@@ -557,7 +559,8 @@ def cut(
     ]
     out = out or results / "film.mp4"
     for s in shots:
-        typer.echo(f"  {s.id}  {s.kind:<5}  {s.clip.relative_to(root)}")
+        trim = f"  (first {s.cut_to:g} s)" if s.cut_to else ""
+        typer.echo(f"  {s.id}  {s.kind:<5}  {s.clip.relative_to(root)}{trim}")
     info = build_cut(shots, out, settings.assets_dir / "cut", title=title,
                      subtitle="a rough cut" if finals < len(shots) else "", end_lines=end_lines)
     typer.secho(f"  wrote {out.relative_to(root) if out.is_relative_to(root) else out}"

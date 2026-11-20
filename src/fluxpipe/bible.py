@@ -93,6 +93,9 @@ class Shot(Strict):
     # M6, image-to-video: only what MOVES from the picked keyframe on, and what the camera does.
     # The start frame already sets the look; re-describing it invites the model to redraw it.
     motion: str | None = None
+    # M7: play only the first N seconds of this shot's clip in the cut, e.g. when the take breaks
+    # late (s09: the copper cage collapses as it's set down). Recorded here, not in a command line.
+    cut_to: float | None = Field(default=None, gt=0)
 
 
 class Baseline(Strict):

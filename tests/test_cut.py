@@ -63,4 +63,8 @@ def test_build_joins_title_shots_and_end(tmp_path):
     assert info["story_s"] == 10.08  # each clip trimmed to whole frames: 2 x 121 / 24 s
     assert info["finals"] == ["s01"] and info["drafts"] == ["s02"]
     first_clip = calls[1][calls[1].index("-vf") + 1]
+    shots[1].cut_to = 2.6
+    info = build(shots, tmp_path / "film.mp4", tmp_path / "work", title="T", subtitle="", end_lines=["x"],
+                 run=lambda cmd, check: calls.append(cmd), probe=lambda clip: 5.041667)
+    assert info["story_s"] == 7.62  # 121/24 + 2.6 (62 whole frames = 2.583)
     assert "fade=in" in first_clip and "fade=out" not in first_clip  # hard cut into s02

@@ -26,7 +26,7 @@ from .demo import BG, DIM, FPS, INK, clip_seconds, font
 
 W, H = 1280, 704
 SCENE_FADE_S = 0.4
-ENCODE = ["-c:v", "libx264", "-preset", "medium", "-crf", "17", "-pix_fmt", "yuv420p", "-r", str(FPS),
+ENCODE = ["-c:v", "libx264", "-preset", "medium", "-crf", "20", "-pix_fmt", "yuv420p", "-r", str(FPS),
           "-video_track_timescale", "12288", "-an"]
 
 
@@ -36,6 +36,7 @@ class CutShot:
     location: str
     clip: Path
     kind: str  # "final" or "draft"
+    cut_to: float | None = None  # the bible's trim, if any
 
 
 def choose_clips(shot_ids: list[tuple[str, str]], picks: dict, clips: dict, results_video: Path,
@@ -134,6 +135,8 @@ def build(shots: list[CutShot], out: Path, work: Path, *, title: str, subtitle: 
     total = 0.0
     for i, (s, (fin, fout)) in enumerate(zip(shots, scene_fades(shots)), 1):
         seconds = (probe or clip_seconds)(s.clip)
+        if s.cut_to:
+            seconds = min(seconds, s.cut_to)
         seconds = int(seconds * FPS) / FPS  # whole frames, so the parts join without a gap
         mp4 = work / f"{i:02d}_{s.id}.mp4"
         run(clip_cmd(s.clip, seconds, fin, fout, mp4), check=True)
