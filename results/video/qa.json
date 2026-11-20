@@ -1,0 +1,252 @@
+{
+  "totals": {
+    "shots": 11,
+    "face_judged": 3,
+    "face_same": 2,
+    "face_worst": 0.487,
+    "face_frames": 18,
+    "face_frames_same": 17,
+    "steady": 10,
+    "jitter_max": 0.57,
+    "jitter_median": 0.11
+  },
+  "shots": [
+    {
+      "shot": "s01",
+      "render": "draft",
+      "seconds": 5.04,
+      "face": {
+        "frames": 10,
+        "judged": 0,
+        "turned_away": 0
+      },
+      "face_text": "too small or turned away in every frame: checked by eye",
+      "face_verdict": "by eye",
+      "background": {
+        "frames": 121,
+        "jitter_px": 0.01,
+        "moved_px": 0.6,
+        "zoom": 0.999,
+        "tracked": 1.0,
+        "verdict": "steady",
+        "camera": "still"
+      }
+    },
+    {
+      "shot": "s02",
+      "render": "final",
+      "seconds": 5.04,
+      "face": {
+        "frames": 10,
+        "judged": 3,
+        "turned_away": 7,
+        "coverage": 0.3,
+        "below": 0,
+        "first": 0.576,
+        "mean": 0.567,
+        "min": 0.558,
+        "drift": 0.018
+      },
+      "face_text": "worst 0.56, first 0.58 (3 of 10 frames judged)",
+      "face_verdict": "same person",
+      "background": {
+        "frames": 121,
+        "jitter_px": 0.32,
+        "moved_px": 50.5,
+        "zoom": 1.168,
+        "tracked": 1.0,
+        "verdict": "steady",
+        "camera": "drifts 50 px, pushes in 17%"
+      }
+    },
+    {
+      "shot": "s03",
+      "render": "draft",
+      "seconds": 5.04,
+      "face": null,
+      "face_text": "hands only, no face meant to be in frame",
+      "face_verdict": "n/a",
+      "background": {
+        "frames": 121,
+        "jitter_px": 0.11,
+        "moved_px": 35.3,
+        "zoom": 1.065,
+        "tracked": 1.0,
+        "verdict": "steady",
+        "camera": "drifts 35 px, pushes in 6%"
+      }
+    },
+    {
+      "shot": "s04",
+      "render": "final",
+      "seconds": 5.04,
+      "face": {
+        "frames": 10,
+        "judged": 5,
+        "turned_away": 5,
+        "coverage": 0.5,
+        "below": 1,
+        "first": 0.62,
+        "mean": 0.564,
+        "min": 0.487,
+        "drift": 0.133
+      },
+      "face_text": "worst 0.49, first 0.62 (5 of 10 frames judged)",
+      "face_verdict": "same person in 4 of 5 frames",
+      "background": {
+        "frames": 121,
+        "jitter_px": 0.02,
+        "moved_px": 1.9,
+        "zoom": 1.003,
+        "tracked": 1.0,
+        "verdict": "steady",
+        "camera": "still"
+      }
+    },
+    {
+      "shot": "s05",
+      "render": "draft",
+      "seconds": 5.04,
+      "face": {
+        "frames": 10,
+        "judged": 0,
+        "turned_away": 0
+      },
+      "face_text": "too small or turned away in every frame: checked by eye",
+      "face_verdict": "by eye",
+      "background": {
+        "frames": 121,
+        "jitter_px": 0.03,
+        "moved_px": 12.4,
+        "zoom": 1.005,
+        "tracked": 1.0,
+        "verdict": "steady",
+        "camera": "drifts 12 px"
+      }
+    },
+    {
+      "shot": "s06",
+      "render": "draft",
+      "seconds": 5.04,
+      "face": {
+        "frames": 10,
+        "judged": 0,
+        "turned_away": 0
+      },
+      "face_text": "too small or turned away in every frame: checked by eye",
+      "face_verdict": "by eye",
+      "background": {
+        "frames": 121,
+        "jitter_px": 0.13,
+        "moved_px": 20.5,
+        "zoom": 0.958,
+        "tracked": 1.0,
+        "verdict": "steady",
+        "camera": "drifts 20 px, pulls out 4%"
+      }
+    },
+    {
+      "shot": "s07",
+      "render": "draft",
+      "seconds": 5.04,
+      "face": {
+        "frames": 10,
+        "judged": 0,
+        "turned_away": 1
+      },
+      "face_text": "too small or turned away in every frame: checked by eye",
+      "face_verdict": "by eye",
+      "background": {
+        "frames": 121,
+        "jitter_px": 0.01,
+        "moved_px": 1.6,
+        "zoom": 1.0,
+        "tracked": 1.0,
+        "verdict": "steady",
+        "camera": "still"
+      }
+    },
+    {
+      "shot": "s08",
+      "render": "final",
+      "seconds": 5.04,
+      "face": {
+        "frames": 10,
+        "judged": 10,
+        "turned_away": 0,
+        "coverage": 1.0,
+        "below": 0,
+        "first": 0.74,
+        "mean": 0.728,
+        "min": 0.633,
+        "drift": 0.107
+      },
+      "face_text": "worst 0.63, first 0.74 (10 of 10 frames judged)",
+      "face_verdict": "same person",
+      "background": {
+        "frames": 121,
+        "jitter_px": 0.57,
+        "moved_px": 76.5,
+        "zoom": 1.201,
+        "tracked": 1.0,
+        "verdict": "slight jitter",
+        "camera": "drifts 76 px, pushes in 20%"
+      }
+    },
+    {
+      "shot": "s09",
+      "render": "draft",
+      "seconds": 2.6,
+      "face": null,
+      "face_text": "hands only, no face meant to be in frame",
+      "face_verdict": "n/a",
+      "background": {
+        "frames": 62,
+        "jitter_px": 0.14,
+        "moved_px": 11.5,
+        "zoom": 1.02,
+        "tracked": 1.0,
+        "verdict": "steady",
+        "camera": "drifts 12 px, pushes in 2%"
+      }
+    },
+    {
+      "shot": "s10",
+      "render": "draft",
+      "seconds": 5.04,
+      "face": null,
+      "face_text": "hands only, no face meant to be in frame",
+      "face_verdict": "n/a",
+      "background": {
+        "frames": 121,
+        "jitter_px": 0.3,
+        "moved_px": 3.0,
+        "zoom": 0.996,
+        "tracked": 1.0,
+        "verdict": "steady",
+        "camera": "still"
+      }
+    },
+    {
+      "shot": "s11",
+      "render": "draft",
+      "seconds": 5.04,
+      "face": {
+        "frames": 10,
+        "judged": 0,
+        "turned_away": 0
+      },
+      "face_text": "too small or turned away in every frame: checked by eye",
+      "face_verdict": "by eye",
+      "background": {
+        "frames": 121,
+        "jitter_px": 0.01,
+        "moved_px": 5.2,
+        "zoom": 1.016,
+        "tracked": 1.0,
+        "verdict": "steady",
+        "camera": "still"
+      }
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-"""Command line: fluxpipe validate | prompts | diff | generate | baseline | keyframes | edit | pick | video | score-clip | demo | cut | score | refs | lock | credits | budget"""
+"""Command line: fluxpipe validate | prompts | diff | generate | baseline | keyframes | edit | pick | video | score-clip | qa | demo | cut | score | refs | lock | credits | budget"""
 
 from __future__ import annotations
 
@@ -600,9 +600,70 @@ def score_clip(
     if summary["turned_away"]:
         typer.secho(f"  {summary['turned_away']} frame(s) not judged: head turned more than "
                     f"{MAX_PITCH_DEG} deg up/down or {MAX_YAW_DEG} deg sideways. Check those by eye.", dim=True)
+    from .qa.background import measure
+
+    bg = measure(clip)
+    colour = {"steady": "green", "slight jitter": "yellow", "jittery": "red", "not tracked": "yellow"}
+    typer.secho(f"background: jitter {bg.jitter_px:.2f} px ({bg.verdict}), camera {bg.camera}",
+                fg=colour[bg.verdict], bold=True)
     out = clip.with_suffix(".faces.json")
-    out.write_text(json.dumps({"summary": summary, "frames": [x.as_dict() for x in scores]}, indent=2) + "\n")
+    out.write_text(json.dumps({"summary": summary, "background": bg.as_dict(),
+                               "frames": [x.as_dict() for x in scores]}, indent=2) + "\n")
     typer.secho(f"  wrote {out}", dim=True)
+
+
+@app.command()
+def qa(
+    character: str = typer.Option("ismael", help="Whose locked face to compare against."),
+) -> None:
+    """Film QA: face identity and background jitter for every clip in the cut. Free (runs locally)."""
+    from .cut import choose_clips
+    from .demo import clip_seconds
+    from .qa.background import measure
+    from .qa.face import insightface_detector, score_images
+    from .qa.report import markdown, row, totals
+    from .qa.video import extract_frames, summarize
+
+    settings = load_settings()
+    bible = load_bible(settings.bible_dir)
+    root = settings.assets_dir.parent
+    results = root / "results"
+    char = bible.characters.get(character)
+    picks = json.loads((results / "keyframes" / "picks.json").read_text())
+    clips_file = results / "video" / "clips.json"
+    clips = json.loads(clips_file.read_text()) if clips_file.is_file() else {}
+    shots, problems = choose_clips([(s.id, s.location) for s in bible.shots], picks, clips,
+                                   results / "video", settings.assets_dir / "video")
+    if problems or char is None or not char.reference_images:
+        for p in problems or [f"no locked face for '{character}'"]:
+            typer.secho(f"  x {p}", fg="red")
+        raise typer.Exit(2)
+
+    typer.echo(f"QA of the {len(shots)} clips the cut uses. Loading InsightFace...")
+    detect = insightface_detector()
+    ref = bible.ref_path(char.reference_images[0])
+    rows = []
+    for s in shots:
+        shot = bible.shot(s.id)
+        work = settings.assets_dir / "qa" / s.id
+        face_summary = None
+        if shot.face:
+            frames = extract_frames(s.clip, work, fps=2.0, seconds=shot.cut_to)
+            scores, _ = score_images(detect, ref, frames)
+            face_summary = summarize(scores)
+        bg = measure(s.clip, seconds=shot.cut_to)
+        seconds = min(clip_seconds(s.clip), shot.cut_to or 1e9)
+        r = row(s.id, s.kind, seconds, face_summary, shot.face, bg.as_dict())
+        rows.append(r)
+        typer.echo(f"  {s.id}  {s.kind:<5}  face: {r['face_text']:<58}  background: {bg.jitter_px:.2f} px"
+                   f" {bg.verdict}, camera {bg.camera}")
+    t = totals(rows)
+    (results / "video" / "qa.json").write_text(json.dumps({"totals": t, "shots": rows}, indent=2) + "\n")
+    (results / "video" / "qa.md").write_text(markdown(rows))
+    typer.secho(f"Face: {t['face_frames_same']} of {t['face_frames']} judged frames the same person"
+                f" (worst {t['face_worst']:.2f}). Background: {t['steady']} of {t['shots']} steady,"
+                f" worst {t['jitter_max']:.2f} px.", bold=True)
+    typer.secho("  wrote results/video/qa.json and results/video/qa.md", dim=True)
 
 
 @app.command()

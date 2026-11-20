@@ -19,17 +19,18 @@ import shutil
 import subprocess
 from pathlib import Path
 
-from .face import FaceScore
+from .face import SAME_PERSON, FaceScore
 
 
-def extract_frames(clip: Path, out_dir: Path, fps: float = 2.0) -> list[Path]:
+def extract_frames(clip: Path, out_dir: Path, fps: float = 2.0, seconds: float | None = None) -> list[Path]:
     if shutil.which("ffmpeg") is None:
         raise RuntimeError("ffmpeg is needed to sample frames (brew install ffmpeg)")
     if out_dir.exists():
         shutil.rmtree(out_dir)
     out_dir.mkdir(parents=True)
     subprocess.run(
-        ["ffmpeg", "-loglevel", "error", "-i", str(clip), "-vf", f"fps={fps}",
+        ["ffmpeg", "-loglevel", "error", "-i", str(clip), *(["-t", f"{seconds}"] if seconds else []),
+         "-vf", f"fps={fps}",
          str(out_dir / "f%03d.png")],
         check=True,
     )
@@ -46,6 +47,7 @@ def summarize(scores: list[FaceScore]) -> dict:
         "judged": len(judged),
         "turned_away": turned,
         "coverage": round(len(judged) / len(scores), 2),
+        "below": sum(s < SAME_PERSON for s in judged),  # judged frames under the same-person line
         "first": judged[0],
         "mean": round(sum(judged) / len(judged), 3),
         "min": min(judged),
