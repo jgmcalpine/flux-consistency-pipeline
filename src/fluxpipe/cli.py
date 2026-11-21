@@ -571,7 +571,7 @@ def cut(
 def report() -> None:
     """README evidence: the cost table from the ledger, figures from the results, web-size videos. Free."""
     from .demo import load_scores
-    from .report import (cost_markdown, cost_rows, fill_markers, headline_markdown, film_strip, frame_at,
+    from .report import (cost_markdown, cost_rows, cost_summary, fill_markers, headline_markdown, film_strip, frame_at,
                          refs_figure, stills_figure, web_video_cmd)
     import subprocess
 
@@ -586,7 +586,8 @@ def report() -> None:
 
     ledger = Ledger(settings.ledger_path, settings.spend_cap_usd)
     calls = [dict(r) for r in ledger.db.execute(
-        "SELECT stage, model, est_cost_usd, actual_cost_usd FROM generations WHERE status IN ('done', 'failed')")]
+        "SELECT stage, model, est_cost_usd, actual_cost_usd, json_extract(params, '$.mode') AS mode,"
+        " json_extract(params, '$.draft') AS draft FROM generations WHERE status IN ('done', 'failed')")]
     rows = cost_rows(calls)
     costs = cost_markdown(rows)
     (results / "costs.md").write_text(costs)
@@ -603,7 +604,8 @@ def report() -> None:
         top = headline_markdown(base_f["pairwise"], pipe_f["pairwise"], sum(s.judged for s in base_s.values()),
                                 sum(s.judged for s in pipe_s.values()), head, qa_totals, rows)
         readme.write_text(fill_markers(readme.read_text(),
-                                       {"headline": top, "costs": costs, "qa": qa_md.read_text()}))
+                                       {"headline": top, "costs": cost_summary(rows, calls, len(bible.shots)),
+                                        "qa": qa_md.read_text()}))
         typer.echo("  README.md: cost and QA tables refreshed")
 
     shots = [s.id for s in bible.shots]

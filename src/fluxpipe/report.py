@@ -53,6 +53,39 @@ def cost_markdown(rows: list[dict]) -> str:
     return "\n".join(lines) + "\n"
 
 
+def cost_summary(rows: list[dict], calls: list[dict], picks: int) -> str:
+    """The README's cost section: what the ledger guarantees and where the money went, then the table."""
+    n = sum(r["calls"] for r in rows)
+    exact = sum(r["exact"] for r in rows)
+    total = sum(r["billed"] for r in rows)
+    by = {r["stage"]: r for r in rows}
+    cheaper = sum(c["actual_cost_usd"] is not None and c["actual_cost_usd"] < c["est_cost_usd"] - 1e-4 for c in calls)
+    dearer = n - exact - cheaper
+    rest = []
+    if cheaper:
+        rest.append(f"{cheaper} billed less")
+    if dearer:
+        rest.append(f"{dearer} billed more or not reported")
+    text = [f"Every paid call's cost is worked out before it is sent, and the ledger refuses any call that would"
+            f" pass the spend cap. Of {n} calls, {exact} were billed exactly as estimated"
+            + (f" ({', '.join(rest)})" if rest else "") + f". Total: **${total:.2f}**, every experiment included."]
+    video = [c for c in calls if c["stage"] == "video"]
+    drafts = [c for c in video if c.get("mode") == "i2v" and c.get("draft")]
+    enhances = [c for c in video if c.get("mode") == "draft_enhance"]
+    spend = lambda cs: sum(c["actual_cost_usd"] if c["actual_cost_usd"] is not None else c["est_cost_usd"]  # noqa: E731
+                           for c in cs)
+    if "keyframe" in by and video:
+        k = by["keyframe"]
+        text.append(
+            f"The money went where problems are cheapest to catch. **${k['billed']:.2f}** bought {k['calls']}"
+            f" keyframe candidates for {picks} picks: stills at about ${k['billed'] / k['calls']:.2f} each, scored"
+            f" before anything moves. **${spend(video):.2f}** went on video: {len(drafts)} drafts at"
+            f" ${spend(drafts) / max(1, len(drafts)):.2f}, and {len(enhances)} full renders at"
+            f" ${spend(enhances) / max(1, len(enhances)):.2f}, paid for only after a draft had passed.")
+    table = cost_markdown(rows)
+    return "\n\n".join(text) + f"\n\n<details>\n<summary>Spend by stage</summary>\n\n{table}\n</details>\n"
+
+
 def headline_markdown(base_pairs: list[float], pipe_pairs: list[float], base_judged: int, pipe_judged: int,
                       head: dict | None, qa_totals: dict | None, cost: list[dict]) -> str:
     """The README's first table, from the same files every other number comes from."""

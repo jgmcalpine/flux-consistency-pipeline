@@ -143,10 +143,14 @@ Each of these came from a real generation in this repo, and each one changed the
 
 ## Cost
 
-Generated from the ledger by `fluxpipe report`. BFL bills FLUX.2 by the megapixel
-and FLUX 3 video by the second; the estimate is made before each call and the real cost recorded after.
-
 <!-- generated:costs -->
+Every paid call's cost is worked out before it is sent, and the ledger refuses any call that would pass the spend cap. Of 155 calls, 153 were billed exactly as estimated (2 billed less). Total: **$15.81**, every experiment included.
+
+The money went where problems are cheapest to catch. **$6.43** bought 72 keyframe candidates for 11 picks: stills at about $0.09 each, scored before anything moves. **$7.20** went on video: 14 drafts at $0.30, and 4 full renders at $0.75, paid for only after a draft had passed.
+
+<details>
+<summary>Spend by stage</summary>
+
 | Stage | Model | Calls | Estimated | Billed | Billed exactly as estimated |
 |---|---|---:|---:|---:|---:|
 | API checks | flux-2-klein-4b, flux-2-pro | 2 | $0.04 | $0.04 | 2 of 2 |
@@ -156,10 +160,9 @@ and FLUX 3 video by the second; the estimate is made before each call and the re
 | Edits (tried; none used) | flux-2-pro | 4 | $0.24 | $0.24 | 4 of 4 |
 | FLUX 3 video: drafts and finals | flux-3-video | 18 | $7.20 | $7.20 | 18 of 18 |
 | **Total** | | **155** | **$15.84** | **$15.81** | **153 of 155** |
-<!-- /generated:costs -->
 
-The two that differ were billed less, both 1920x1088 costume sheets: the estimate deliberately counts
-a megapixel as 10^6 pixels and rounds up (3 MP), and BFL billed 2 MP, consistent with a megapixel of 2^20.
+</details>
+<!-- /generated:costs -->
 
 ## Run it
 

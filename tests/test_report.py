@@ -49,3 +49,15 @@ def test_headline_says_what_the_numbers_mean():
     assert "best pair **0.37**: no two shots show the same man" in top
     assert "worst pair **0.59**: every pair is the same man" in top
     assert "| **0.30** | **0.71** |" in top and "**17 of 18**" in top and "$0.30** for 1 calls" in top
+
+
+def test_cost_summary_says_what_the_ledger_guarantees_and_where_the_money_went():
+    from fluxpipe.report import cost_summary
+
+    calls = [_call("refs", 0.075, 0.06), _call("keyframe", 0.09, 0.09), _call("keyframe", 0.09, 0.09),
+             {**_call("video", 0.3, 0.3, "flux-3-video"), "mode": "i2v", "draft": 1},
+             {**_call("video", 0.75, 0.75, "flux-3-video"), "mode": "draft_enhance", "draft": None}]
+    text = cost_summary(cost_rows(calls), calls, picks=1)
+    assert "Of 5 calls, 4 were billed exactly as estimated (1 billed less)" in text
+    assert "2 keyframe candidates for 1 picks" in text and "1 drafts at $0.30, and 1 full renders at $0.75" in text
+    assert "<details>" in text and "| **Total** |" in text
