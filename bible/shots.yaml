@@ -9,7 +9,7 @@
 # Crystal: small (thumb length); shots hold it between thumb and forefinger to pin the scale.
 # Face shots for identity QA: s02, s04, s07, s08 (s01, s05, s06, s11 too small to judge).
 # s03, s09, s10 are hands only (face: false): QA fails a candidate that shows his face.
-# plate: false = don't attach the location plate (it copies its camera position; see CLAUDE.md).
+# plate: false = don't attach the location plate (it copies its camera position; see the README, "What the generations taught").
 # s10 is the riskiest shot (fingers + small objects). If it fails, cut s09 -> s11.
 
 # Applies to every shot. One look for the whole film = one place to change it.

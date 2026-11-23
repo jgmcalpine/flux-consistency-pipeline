@@ -502,8 +502,13 @@ def demo(
     out = out or results / "demo.mp4"
     spend = Ledger(settings.ledger_path, settings.spend_cap_usd).total_spent()
     typer.echo(f"Building {len(shots)} shots: {', '.join(s.id for s in shots)}...")
+    qa_file = results / "video" / "qa.json"  # the film's background steadiness, for the closing card
+    qa_totals = json.loads(qa_file.read_text())["totals"] if qa_file.is_file() else None
+    if qa_totals is None:
+        typer.secho("  ! no results/video/qa.json (fluxpipe qa): the closing card leaves out steadiness",
+                    fg="yellow")
     info = build(shots, bible.ref_path(char.reference_images[0]), out, settings.assets_dir / "demo",
-                 spend_usd=spend)
+                 spend_usd=spend, qa_totals=qa_totals)
     for s in shots:
         b, p = s.base.label(), s.pipe.label()
         typer.echo(f"  {s.id}: plain {b[0]} ({b[1]})  vs  pipeline {p[0]} ({p[1]})")

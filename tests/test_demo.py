@@ -61,3 +61,15 @@ def test_build_renders_every_part_then_joins_them(tmp_path):
     assert Image.open(tmp_path / "work" / "01_s04.png").size == (demo.W, demo.H)
     listed = (tmp_path / "work" / "parts.txt").read_text().splitlines()
     assert len(listed) == 4 and listed[0].endswith("00_intro.mp4'")
+
+
+def test_closing_card_states_the_films_background_steadiness():
+    from fluxpipe.demo import background_line, outro_card
+
+    line = background_line({"steady": 10, "shots": 11, "jitter_median": 0.11})
+    assert line == ("Background in the full film: 10 of 11 shots steady, median jitter 0.11 px"
+                    " (under 0.5 px is steady)")
+    assert background_line(None) is None and background_line({"shots": 0}) is None
+    card = outro_card({"shots": ["s04"], "baseline": 0.3, "pipeline": 0.7}, 15.81,
+                      {"steady": 10, "shots": 11, "jitter_median": 0.11})
+    assert card.size == (1920, 1080)

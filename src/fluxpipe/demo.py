@@ -11,7 +11,7 @@ The two sides differ only in what the pipeline adds: same model, size and seed f
 generation, so no spend, and it isn't pretending to be a video model's output. The right side
 is the enhanced FLUX 3 clip animated from the pipeline's keyframe. The scores shown are the
 STILLS' scores on both sides, so the comparison is like for like (a video frame loses face
-detail to compression, see CLAUDE.md "Lessons").
+detail to compression; see the README, "What the generations taught").
 
 This ffmpeg has no drawtext filter, so all text is drawn with Pillow onto a full-frame card, and
 the two pictures are overlaid onto it with ffmpeg.
@@ -162,7 +162,17 @@ def intro_card(face_png: Path, n_shots: int) -> Image.Image:
     return img
 
 
-def outro_card(head: dict | None, spend_usd: float | None) -> Image.Image:
+def background_line(qa_totals: dict | None) -> str | None:
+    """The film's background steadiness in one sentence, from `fluxpipe qa`'s totals. It covers the
+    whole film, not the demo's shots: the plain side is a still, so it has no steadiness to compare."""
+    if not qa_totals or not qa_totals.get("shots"):
+        return None
+    t = qa_totals
+    return (f"Background in the full film: {t['steady']} of {t['shots']} shots steady,"
+            f" median jitter {t['jitter_median']:.2f} px (under 0.5 px is steady)")
+
+
+def outro_card(head: dict | None, spend_usd: float | None, qa_totals: dict | None = None) -> Image.Image:
     img = Image.new("RGB", (W, H), BG)
     d = ImageDraw.Draw(img)
     cx = W // 2
@@ -176,6 +186,8 @@ def outro_card(head: dict | None, spend_usd: float | None) -> Image.Image:
         d.text((cx, 640), f"mean over the shots scored on both sides ({', '.join(head['shots'])});"
                " 0.50 or more = the same person", font=font(28), fill=DIM, anchor="ms")
     lines = ["References, not words, hold identity. Every call checked against a spend cap."]
+    if background_line(qa_totals):
+        lines.append(background_line(qa_totals))
     if spend_usd is not None:
         lines.append(f"Total FLUX API spend so far, every experiment included: ${spend_usd:.2f}")
     for i, line in enumerate(lines):
@@ -241,7 +253,7 @@ class DemoShot:
 
 
 def build(shots: list[DemoShot], face_png: Path, out: Path, work: Path, *,
-          spend_usd: float | None = None, intro_s: float = 4.0, outro_s: float = 5.0,
+          spend_usd: float | None = None, qa_totals: dict | None = None, intro_s: float = 4.0, outro_s: float = 6.0,
           shot_s: float = 5.0, run=subprocess.run, probe=None) -> dict:
     """Render every part into `work`, join them into `out`. Returns what the demo shows."""
     if shutil.which("ffmpeg") is None:
@@ -265,7 +277,7 @@ def build(shots: list[DemoShot], face_png: Path, out: Path, work: Path, *,
         run(shot_cmd(png, s.baseline_png, s.clip, seconds, mp4), check=True)
         parts.append(mp4)
     head = headline([s.id for s in shots], {s.id: s.base for s in shots}, {s.id: s.pipe for s in shots})
-    card(outro_card(head, spend_usd), "99_outro", outro_s)
+    card(outro_card(head, spend_usd, qa_totals), "99_outro", outro_s)
 
     list_file = work / "parts.txt"
     list_file.write_text("".join(f"file '{p.resolve()}'\n" for p in parts))
