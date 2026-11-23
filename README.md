@@ -199,4 +199,4 @@ Every command that spends money says what it will cost first and goes through th
 
 ## Licensing
 
-InsightFace's pretrained `buffalo_l` models, used for face QA, are licensed for non-commercial research use.
+The code is MIT-licensed ([LICENSE](LICENSE)). InsightFace's pretrained `buffalo_l` models, used for face QA, are licensed for non-commercial research use.
